@@ -1,0 +1,16 @@
+= PTCMR API
+:toc:
+
+== 테스트용 API
+
+=== 요청
+
+include::{snippets}/index/http-request.adoc[]
+
+=== 응답
+
+include::{snippets}/index/http-response.adoc[]
+
+=== curl
+
+include::{snippets}/index/curl-request.adoc[]
