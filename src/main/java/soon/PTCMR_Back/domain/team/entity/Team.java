@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,4 +25,10 @@ public class Team {
 
     @Embedded
     private NotificationSchedule schedule;
+
+    @Builder
+    public Team(String title, NotificationSchedule schedule) {
+        this.title = title;
+        this.schedule = schedule;
+    }
 }

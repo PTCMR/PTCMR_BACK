@@ -13,21 +13,21 @@ import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
 import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.product.entity.ProductStatus;
 import soon.PTCMR_Back.domain.product.entity.StorageType;
-import soon.PTCMR_Back.domain.product.repository.ProductRepository;
+import soon.PTCMR_Back.domain.product.repository.ProductJpaRepository;
 
 
 @SpringBootTest
 class ProductServiceTest {
 
     @Autowired
-    ProductRepository productRepository;
+    ProductJpaRepository productJpaRepository;
 
     @Autowired
     ProductService productService;
 
     @BeforeEach
     void clean() {
-        productRepository.deleteAll();
+        productJpaRepository.deleteAll();
     }
 
     @Test
@@ -42,9 +42,9 @@ class ProductServiceTest {
         productService.create(request);
 
         // then
-        assertThat(productRepository.count()).isEqualTo(1);
+        assertThat(productJpaRepository.count()).isEqualTo(1);
 
-        Product product = productRepository.findAll().getFirst();
+        Product product = productJpaRepository.findAll().getFirst();
         Assertions.assertEquals(request.getName(), product.getName());
         Assertions.assertEquals(request.getQuantity(), product.getQuantity());
 

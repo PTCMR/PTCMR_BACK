@@ -1,8 +1,20 @@
 package soon.PTCMR_Back.domain.team.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 import soon.PTCMR_Back.domain.team.entity.Team;
 
-public interface TeamRepository extends JpaRepository<Team, Long> {
+@RequiredArgsConstructor
+@Repository
+public class TeamRepository {
 
+    private final TeamJpaRepository teamJpaRepository;
+
+    public void save(Team team) {
+        teamJpaRepository.save(team);
+    }
+
+    public boolean existsById(Long id) {
+        return teamJpaRepository.existsById(id);
+    }
 }

@@ -15,7 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
-import soon.PTCMR_Back.domain.product.repository.ProductRepository;
+import soon.PTCMR_Back.domain.product.repository.ProductJpaRepository;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -28,11 +28,11 @@ class ProductControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ProductRepository productRepository;
+    private ProductJpaRepository productJpaRepository;
 
     @BeforeEach
     void clean() {
-        productRepository.deleteAll();
+        productJpaRepository.deleteAll();
     }
 
     @Test

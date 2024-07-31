@@ -1,8 +1,16 @@
 package soon.PTCMR_Back.domain.product.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 import soon.PTCMR_Back.domain.product.entity.Product;
 
-public interface ProductRepository extends JpaRepository<Product, Long> {
+@RequiredArgsConstructor
+@Repository
+public class ProductRepository {
 
+    private final ProductJpaRepository productJpaRepository;
+
+    public void save(Product product) {
+        productJpaRepository.save(product);
+    }
 }
