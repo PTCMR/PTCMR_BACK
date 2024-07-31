@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ErrorCode {
 
-    TEST(400, "테스트용 에러");
+    TEAM_NOT_FOUND(404, "존재하지 않는 팀입니다.");
 
     private final int status;
     private final String message;

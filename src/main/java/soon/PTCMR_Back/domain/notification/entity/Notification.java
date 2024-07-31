@@ -42,6 +42,16 @@ public class Notification {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @Builder
+    private Notification(String title, String content, NotificationType type, boolean isRead,
+        Member member) {
+        this.title = title;
+        this.content = content;
+        this.type = type;
+        this.isRead = isRead;
+        this.member = member;
+    }
+
     public static Notification create(
         String title, String content, NotificationType type, Member member
     ) {
@@ -52,15 +62,5 @@ public class Notification {
             .isRead(false)
             .member(member)
             .build();
-    }
-
-    @Builder
-    private Notification(String title, String content, NotificationType type, boolean isRead,
-        Member member) {
-        this.title = title;
-        this.content = content;
-        this.type = type;
-        this.isRead = isRead;
-        this.member = member;
     }
 }
