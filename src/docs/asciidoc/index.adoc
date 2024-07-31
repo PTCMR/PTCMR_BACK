@@ -1,16 +1,20 @@
 = PTCMR API
-:toc:
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 1
+:sectlinks:
 
-== 테스트용 API
+
+== 상품 생성
 
 === 요청
 
-include::{snippets}/index/http-request.adoc[]
+include::{snippets}/product-create/http-request.adoc[]
+
+include::{snippets}/product-create/request-fields.adoc[]
 
 === 응답
 
-include::{snippets}/index/http-response.adoc[]
-
-=== curl
-
-include::{snippets}/index/curl-request.adoc[]
+include::{snippets}/product-create/http-response.adoc[]
