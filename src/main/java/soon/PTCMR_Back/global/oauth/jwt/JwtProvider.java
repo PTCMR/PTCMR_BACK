@@ -24,14 +24,11 @@ public class JwtProvider {
 
 	private final long TOKEN_TIME = 30 * 60 * 1000L;
 
-	@Value("${jwt.secret.key}")
-	private String secretKey;
-
 	private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
 	private final Key key;
 
-	public JwtProvider() {
+	public JwtProvider(@Value("${jwt.secret.key}") String secretKey) {
 		byte[] bytes = Base64.getDecoder().decode(secretKey);
 		key = Keys.hmacShaKeyFor(bytes);
 	}
