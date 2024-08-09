@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,7 +23,10 @@ public class Member {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String uuid;
+
+    @Column(nullable = false)
+    private String email;
 
     @Column(nullable = false)
     private String deviceToken;
@@ -30,4 +34,20 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
 
+    public static Member create(String uuid, String email, String deviceToken, SocialType socialType) {
+        return Member.builder()
+            .email(email)
+            .socialType(socialType)
+            .uuid(uuid)
+            .deviceToken(deviceToken)
+            .build();
+    }
+
+    @Builder
+    private Member(String email, String deviceToken, SocialType socialType, String uuid) {
+        this.email = email;
+        this.deviceToken = deviceToken;
+        this.socialType = socialType;
+        this.uuid = uuid;
+    }
 }
