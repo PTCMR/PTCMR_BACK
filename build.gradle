@@ -59,6 +59,10 @@ dependencies {
     // restdocs
     asciidoctorExt "org.springframework.restdocs:spring-restdocs-asciidoctor"
     testImplementation "org.springframework.restdocs:spring-restdocs-mockmvc"
+
+    // google cloud vision
+    implementation 'com.google.cloud:google-cloud-vision:3.34.0'
+
 }
 
 tasks.named('test') {
