@@ -50,7 +50,7 @@ public class ProductControllerDocsTest {
                 .contentType(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .content(json))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andDo(print())
             .andDo(document("product-create",
                 requestFields(
