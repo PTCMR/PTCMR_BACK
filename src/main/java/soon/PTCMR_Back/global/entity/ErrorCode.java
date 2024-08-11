@@ -7,7 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ErrorCode {
 
-    TEAM_NOT_FOUND(404, "존재하지 않는 팀입니다.");
+    TEAM_NOT_FOUND(404, "존재하지 않는 팀입니다."),
+    PRODUCT_NOT_FOUND(404, "존재하지 않는 상품입니다.");
 
     private final int status;
     private final String message;
