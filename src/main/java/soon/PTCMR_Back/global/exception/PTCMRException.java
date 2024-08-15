@@ -13,8 +13,4 @@ public abstract class PTCMRException extends RuntimeException {
     private final Map<String, String> validation = new HashMap<>();
 
     private final ErrorCode errorCode;
-
-    public void addValidation(String fieldName, String message) {
-        validation.put(fieldName, message);
-    }
 }

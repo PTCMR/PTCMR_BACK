@@ -15,12 +15,16 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
 import soon.PTCMR_Back.domain.team.entity.Team;
 
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@SQLDelete(sql = "UPDATE product SET deleted = true WHERE id=?")
+@SQLRestriction("deleted = false")
 @Entity
 public class Product {
 
@@ -43,7 +47,8 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
-    private boolean delete = false;
+    @Column(columnDefinition = "tinyint(1) default 0")
+    private boolean deleted;
 
     @Enumerated(EnumType.STRING)
     private StorageType storageType;
@@ -68,7 +73,8 @@ public class Product {
         this.description = request.getDescription();
 
         // TODO S3 연동 후 변겅
-        this.imageUrl = request.getImageUrl().isEmpty() ? "default image url" : request.getImageUrl();
+        this.imageUrl =
+            request.getImageUrl().isEmpty() ? "default image url" : request.getImageUrl();
 
         // TODO Team 구현 후 변경
         this.team = team;
@@ -76,5 +82,9 @@ public class Product {
 
     public static Product create(ProductCreateRequest request) {
         return new Product(request);
+    }
+
+    public void delete() {
+        this.deleted = true;
     }
 }

@@ -2,14 +2,18 @@ package soon.PTCMR_Back.domain.product.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,8 +22,11 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
+import soon.PTCMR_Back.domain.product.entity.Product;
+import soon.PTCMR_Back.domain.product.service.ProductService;
 
 @AutoConfigureRestDocs(uriScheme = "https", uriHost = "dns-name.com", uriPort = 443)
 @AutoConfigureMockMvc
@@ -32,6 +39,9 @@ public class ProductControllerDocsTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private ProductService productService;
 
     @Test
     @DisplayName("상품 셀프 등록")
@@ -50,7 +60,7 @@ public class ProductControllerDocsTest {
                 .contentType(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .content(json))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andDo(print())
             .andDo(document("product-create",
                 requestFields(
@@ -64,5 +74,26 @@ public class ProductControllerDocsTest {
                     fieldWithPath("teamId").description("팀 번호")
                 )
             ));
+    }
+
+    @Test
+    @DisplayName("상품 삭제")
+    void productDelete() throws Exception {
+        // given
+        LocalDateTime expirationDate = LocalDateTime.now().plusDays(1);
+
+        ProductCreateRequest request = new ProductCreateRequest("자일리톨", expirationDate,
+            1, "", "FROZEN",
+            true, "이것은 자일리톨 껌이요", 1L);
+
+        Long productId = productService.create(request);
+
+        // expected
+        mockMvc.perform(delete("/api/v1/product/{productId}", productId)
+                .contentType(APPLICATION_JSON))
+            .andExpect(status().isNoContent())
+            .andDo(print())
+            .andDo(document("product-delete",
+                pathParameters(parameterWithName("productId").description("상품 ID"))));
     }
 }

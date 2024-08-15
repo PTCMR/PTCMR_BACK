@@ -38,4 +38,10 @@ public class ProductService {
 
         return product.getId();
     }
+
+    @Transactional
+    public void delete(Long productId) {
+        Product product = productRepository.findById(productId);
+        product.delete();
+    }
 }
