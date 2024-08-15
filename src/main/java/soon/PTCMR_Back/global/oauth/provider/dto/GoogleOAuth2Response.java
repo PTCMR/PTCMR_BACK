@@ -27,11 +27,6 @@ public class GoogleOAuth2Response implements OAuth2Response {
 	}
 
 	@Override
-	public String getEmail() {
-		return attributes.get("email").toString();
-	}
-
-	@Override
 	public String getUUID() {
 		return getProvider() + " " + getProviderId();
 	}

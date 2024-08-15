@@ -29,19 +29,11 @@ public class CustomOAuth2User implements OAuth2User {
 		return userDTO.name();
 	}
 
-	public String getEmail() {
-		return userDTO.email();
-	}
-
 	public SocialType getProvider() {
 		return userDTO.provider();
 	}
 
 	public String getUUID(){
 		return userDTO.uuid();
-	}
-
-	public String getProviderId() {
-		return userDTO.providerId();
 	}
 }

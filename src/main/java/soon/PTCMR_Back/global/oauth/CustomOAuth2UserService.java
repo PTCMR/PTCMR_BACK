@@ -1,6 +1,6 @@
 package soon.PTCMR_Back.global.oauth;
 
-import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -13,8 +13,8 @@ import soon.PTCMR_Back.domain.member.entity.Member;
 import soon.PTCMR_Back.domain.member.entity.SocialType;
 import soon.PTCMR_Back.domain.member.repository.MemberRepository;
 import soon.PTCMR_Back.global.oauth.dto.UserDTO;
-import soon.PTCMR_Back.global.oauth.provider.dto.OAuth2Response;
 import soon.PTCMR_Back.global.oauth.provider.OAuth2ProviderFactory;
+import soon.PTCMR_Back.global.oauth.provider.dto.OAuth2Response;
 
 @Service
 @Slf4j(topic = "OAuth2Service")
@@ -31,23 +31,28 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		log.info(String.valueOf(oAuth2User));
 
 		String registrationId = userRequest.getClientRegistration().getRegistrationId();
+
 		OAuth2Response oAuth2Response = OAuth2ProviderFactory.createOAuth2Response(registrationId,
 			oAuth2User.getAttributes());
 
-		Member member = memberRepository.findByUuid(oAuth2Response.getUUID());
+		Optional<Member> member = Optional.ofNullable(
+			memberRepository.findByUuid(oAuth2Response.getUUID()));
 
-		if (Objects.isNull(member)) {
+		if (member.isEmpty()) {
 			createMember(
-				oAuth2Response.getEmail(),
+				oAuth2Response.getName(),
 				oAuth2Response.getUUID(),
 				oAuth2Response.getProvider()
 			);
+		} else {
+			member.get().update(
+				oAuth2Response.getUUID(),
+				oAuth2Response.getName(),
+				oAuth2Response.getProvider());
 		}
 
 		UserDTO userDTO = new UserDTO(
 			oAuth2Response.getProvider(),
-			oAuth2Response.getProviderId(),
-			oAuth2Response.getEmail(),
 			oAuth2Response.getName(),
 			oAuth2Response.getUUID()
 		);
@@ -55,7 +60,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		return new CustomOAuth2User(userDTO);
 	}
 
-	private void createMember(String email, String uuid, SocialType provider) {
-		memberRepository.save(Member.create(uuid, email, "default", provider));
+	private void createMember(String name, String uuid, SocialType provider) {
+		// TODO : deviceToken 입력
+		memberRepository.save(Member.create(uuid, name, "default", provider));
 	}
 }

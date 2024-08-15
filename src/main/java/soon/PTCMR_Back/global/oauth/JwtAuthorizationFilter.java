@@ -1,5 +1,6 @@
 package soon.PTCMR_Back.global.oauth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,11 +8,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import soon.PTCMR_Back.global.exception.AuthorizationDeniedException;
 import soon.PTCMR_Back.global.oauth.dto.UserDTO;
 import soon.PTCMR_Back.global.oauth.jwt.JwtProvider;
 
@@ -20,6 +23,7 @@ import soon.PTCMR_Back.global.oauth.jwt.JwtProvider;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 	private final JwtProvider jwtProvider;
+	private final ObjectMapper objectMapper;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -46,6 +50,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 		} catch (RuntimeException e) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+			objectMapper.writeValueAsString(new AuthorizationDeniedException());
 		}
 	}
 }

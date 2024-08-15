@@ -6,6 +6,5 @@ public interface OAuth2Response {
 	SocialType getProvider();
 	String getProviderId();
 	String getName();
-	String getEmail();
 	String getUUID();
 }

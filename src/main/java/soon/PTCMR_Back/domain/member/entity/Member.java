@@ -23,10 +23,10 @@ public class Member {
     private Long id;
 
     @Column(nullable = false)
-    private String uuid;
+    private String name;
 
     @Column(nullable = false)
-    private String email;
+    private String uuid;
 
     @Column(nullable = false)
     private String deviceToken;
@@ -34,9 +34,9 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
 
-    public static Member create(String uuid, String email, String deviceToken, SocialType socialType) {
+    public static Member create(String uuid, String name, String deviceToken, SocialType socialType) {
         return Member.builder()
-            .email(email)
+            .name(name)
             .socialType(socialType)
             .uuid(uuid)
             .deviceToken(deviceToken)
@@ -44,10 +44,12 @@ public class Member {
     }
 
     @Builder
-    private Member(String email, String deviceToken, SocialType socialType, String uuid) {
-        this.email = email;
+    private Member(String name, String deviceToken, SocialType socialType, String uuid) {
+        this.name = name;
         this.deviceToken = deviceToken;
         this.socialType = socialType;
         this.uuid = uuid;
     }
+
+    public void update(String uuid, String name, SocialType socialType) {}
 }

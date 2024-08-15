@@ -30,11 +30,6 @@ public class KakaoOAuth2Response implements OAuth2Response {
 	}
 
 	@Override
-	public String getEmail() {
-		return "test@kakao.com";
-	}
-
-	@Override
 	public String getUUID() {
 		return getProvider() + " " + getProviderId();
 	}
