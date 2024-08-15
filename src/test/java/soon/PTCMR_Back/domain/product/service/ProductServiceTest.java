@@ -3,6 +3,7 @@ package soon.PTCMR_Back.domain.product.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,5 +50,19 @@ class ProductServiceTest {
         Assertions.assertEquals(request.getQuantity(), product.getQuantity());
 
         Assertions.assertEquals(ProductStatus.YELLOW, product.getStatus());
+    }
+
+    @Test
+    @DisplayName("상품 삭제")
+    void delete() {
+        ProductCreateRequest request = new ProductCreateRequest("자일리톨",
+            LocalDateTime.now().plusDays(19), 2, "", StorageType.ROOM_TEMPERATURE.toString(),
+            true, "이것은 자일리톨 껌이요", 1L);
+
+        Long productId = productService.create(request);
+
+        productService.delete(productId);
+
+        assertThat(productJpaRepository.count()).isEqualTo(0);
     }
 }

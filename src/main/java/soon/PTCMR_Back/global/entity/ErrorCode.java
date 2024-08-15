@@ -11,6 +11,6 @@ public enum ErrorCode {
 	MEMBER_NOT_FOUND(404, "존재하지 않는 멤버입니다."),
 	AUTHORIZATION_DENIED(404, "접근 권한이 없습니다.");
 
-	private final int status;
-	private final String message;
+    private final int status;
+    private final String message;
 }
