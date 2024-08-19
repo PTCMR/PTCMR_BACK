@@ -18,6 +18,7 @@ import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
+import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
 import soon.PTCMR_Back.domain.team.entity.Team;
 import soon.PTCMR_Back.global.entity.BaseTimeEntity;
 
@@ -87,5 +88,15 @@ public class Product extends BaseTimeEntity {
 
     public void delete() {
         this.deleted = true;
+    }
+
+    public void update(ProductUpdateRequest request) {
+        this.name = request.getName();
+        this.expirationDate = request.getExpirationDate();
+        this.quantity = request.getQuantity();
+        this.storageType = StorageType.valueOf(request.getStorageType());
+        this.repurchase = request.isRepurchase();
+        this.description = request.getDescription();
+        this.imageUrl = request.getImageUrl();
     }
 }
