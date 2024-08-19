@@ -14,6 +14,7 @@ public class TeamService {
     private final TeamRepository teamRepository;
 
 
+    @Transactional
     public Long create(String title) {
         Team team = Team.create(title);
 
