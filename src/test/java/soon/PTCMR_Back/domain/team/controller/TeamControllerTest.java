@@ -14,7 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamCreateRequest;
 
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @SpringBootTest
 public class TeamControllerTest {
 
