@@ -19,6 +19,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
 import soon.PTCMR_Back.domain.team.entity.Team;
+import soon.PTCMR_Back.global.entity.BaseTimeEntity;
 
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,7 +27,7 @@ import soon.PTCMR_Back.domain.team.entity.Team;
 @SQLDelete(sql = "UPDATE product SET deleted = true WHERE id=?")
 @SQLRestriction("deleted = false")
 @Entity
-public class Product {
+public class Product extends BaseTimeEntity {
 
     @ToString.Exclude
     @Id
