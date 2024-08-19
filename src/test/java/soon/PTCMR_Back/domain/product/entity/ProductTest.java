@@ -1,7 +1,5 @@
 package soon.PTCMR_Back.domain.product.entity;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.time.LocalDateTime;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
 
