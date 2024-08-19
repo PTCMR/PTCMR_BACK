@@ -100,3 +100,11 @@ bootJar {
 jar {
     enabled = false
 }
+
+task copyPrivate(type: Copy) {
+    copy {
+        from './PTCMR_yml'
+        include "*.yml"
+        into 'src/main/resources'
+    }
+}
