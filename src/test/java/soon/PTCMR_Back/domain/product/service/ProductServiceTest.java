@@ -2,6 +2,7 @@ package soon.PTCMR_Back.domain.product.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
 
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -86,11 +87,5 @@ class ProductServiceTest {
         // then
         assertThat(newName).isEqualTo(updatedProduct.getName());
         assertThat(quantity).isEqualTo(updatedProduct.getQuantity());
-    }
-
-    private Product createProduct() {
-        return Product.create(new ProductCreateRequest("자일리톨",
-            LocalDateTime.now().plusDays(19), 2, "", StorageType.ROOM_TEMPERATURE.toString(),
-            true, "이것은 자일리톨 껌이요", 1L));
     }
 }
