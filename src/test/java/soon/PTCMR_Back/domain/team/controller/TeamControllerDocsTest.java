@@ -22,7 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamCreateRequest;
 
 @AutoConfigureRestDocs(uriScheme = "https", uriHost = "dns-name.com", uriPort = 443)
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(RestDocumentationExtension.class)
 @SpringBootTest
 public class TeamControllerDocsTest {
