@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import soon.PTCMR_Back.domain.member.MockUser;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamCreateRequest;
 
 @AutoConfigureMockMvc(addFilters = false)
@@ -24,6 +26,10 @@ public class TeamControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @BeforeEach
+    void setUp() {
+        MockUser.createMockUser();
+    }
 
     @Test
     @DisplayName("[POST] /api/v1/team 요청 시 팀 생성")
