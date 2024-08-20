@@ -27,6 +27,21 @@ include::{snippets}/product-delete/http-request.adoc[]
 
 include::{snippets}/product-delete/path-parameters.adoc[]
 
+== 상품 수정
+
+=== 요청
+
+include::{snippets}/product-update/http-request.adoc[]
+
+include::{snippets}/product-update/request-fields.adoc[]
+
+include::{snippets}/product-update/path-parameters.adoc[]
+
+=== 응답
+
+include::{snippets}/product-update/http-response.adoc[]
+=======
+
 == 팀 생성
 
 === 요청
