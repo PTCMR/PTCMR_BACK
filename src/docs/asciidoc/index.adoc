@@ -26,3 +26,14 @@ include::{snippets}/product-create/http-response.adoc[]
 include::{snippets}/product-delete/http-request.adoc[]
 
 include::{snippets}/product-delete/path-parameters.adoc[]
+
+== 팀 생성
+
+=== 요청
+
+include::{snippets}/team-create/http-request.adoc[]
+include::{snippets}/team-create/request-fields.adoc[]
+
+=== 응답
+
+include::{snippets}/team-create/http-response.adoc[]

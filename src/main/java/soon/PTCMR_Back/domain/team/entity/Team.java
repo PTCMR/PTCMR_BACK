@@ -10,11 +10,16 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+import soon.PTCMR_Back.global.entity.BaseTimeEntity;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE Team SET deleted = true WHERE id=?")
+@SQLRestriction("deleted = false")
 @Getter
 @Entity
-public class Team {
+public class Team extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,8 +31,22 @@ public class Team {
     @Embedded
     private NotificationSchedule schedule;
 
+    @Column(columnDefinition = "tinyint(1) default 0")
+    private boolean deleted;
+
+    public static Team create(String title) {
+        return Team.builder()
+            .title(title)
+            .schedule(NotificationSchedule.create())
+            .build();
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
     @Builder
-    public Team(String title, NotificationSchedule schedule) {
+    private Team(String title, NotificationSchedule schedule) {
         this.title = title;
         this.schedule = schedule;
     }
