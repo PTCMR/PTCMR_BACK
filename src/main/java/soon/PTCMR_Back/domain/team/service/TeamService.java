@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import soon.PTCMR_Back.domain.member.entity.Member;
 import soon.PTCMR_Back.domain.member.repository.MemberRepository;
+import soon.PTCMR_Back.domain.team.dto.response.TeamDetails;
 import soon.PTCMR_Back.domain.team.entity.Team;
 import soon.PTCMR_Back.domain.team.repository.TeamRepository;
 
@@ -27,5 +28,14 @@ public class TeamService {
         teamManager.joinTeam(team, member);
 
         return result;
+    }
+
+    @Transactional
+    public TeamDetails update(Long teamId, String newTitle, long notificationDay, long notificationHour, String uuid) {
+        Team team = teamRepository.findById(teamId);
+        team.update(newTitle, notificationDay, notificationHour);
+
+
+        return TeamDetails.from(team);
     }
 }
