@@ -47,7 +47,7 @@ class ProductControllerTest {
         LocalDateTime expirationDate = LocalDateTime.now().plusDays(1);
 
         ProductCreateRequest request = new ProductCreateRequest("자일리톨",
-            expirationDate, 1, "", "FROZEN",
+            expirationDate, 1, "", "Frozen",
             true, "이것은 자일리톨 껌이요", 1L);
 
         String json = objectMapper.writeValueAsString(request);

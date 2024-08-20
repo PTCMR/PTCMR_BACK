@@ -70,7 +70,7 @@ public class Product extends BaseTimeEntity {
         this.expirationDate = request.getExpirationDate();
         this.quantity = request.getQuantity();
         this.status = ProductStatus.getProductStatus(request.getExpirationDate());
-        this.storageType = StorageType.valueOf(request.getStorageType());
+        this.storageType = StorageType.toStorageType(request.getStorageType());
         this.repurchase = request.isRepurchase();
         this.description = request.getDescription();
 
