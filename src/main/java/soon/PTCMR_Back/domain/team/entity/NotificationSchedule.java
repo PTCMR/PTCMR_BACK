@@ -17,7 +17,16 @@ public class NotificationSchedule {
     @Column(name = "hours")
     private long hour;
 
-    public NotificationSchedule(long day, long hour) {
+    public static NotificationSchedule create() {
+        return new NotificationSchedule(7, 12);
+    }
+
+    public void updateNotificationTime(long day, long hour) {
+        this.day = day;
+        this.hour = hour;
+    }
+
+    private NotificationSchedule(long day, long hour) {
         this.day = day;
         this.hour = hour;
     }

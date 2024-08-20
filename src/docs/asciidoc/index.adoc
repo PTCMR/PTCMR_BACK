@@ -40,3 +40,15 @@ include::{snippets}/product-update/path-parameters.adoc[]
 === 응답
 
 include::{snippets}/product-update/http-response.adoc[]
+=======
+
+== 팀 생성
+
+=== 요청
+
+include::{snippets}/team-create/http-request.adoc[]
+include::{snippets}/team-create/request-fields.adoc[]
+
+=== 응답
+
+include::{snippets}/team-create/http-response.adoc[]
