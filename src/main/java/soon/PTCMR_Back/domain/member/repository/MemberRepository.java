@@ -3,7 +3,6 @@ package soon.PTCMR_Back.domain.member.repository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import soon.PTCMR_Back.domain.member.entity.Member;
-import soon.PTCMR_Back.global.exception.MemberNotFoundException;
 
 @Repository
 @RequiredArgsConstructor
@@ -19,4 +18,7 @@ public class MemberRepository {
 		return jpaRepository.findByUuid(uuid);
 	}
 
+	public void deleteAll() {
+		jpaRepository.deleteAll();
+	}
 }
