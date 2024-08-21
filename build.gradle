@@ -101,7 +101,7 @@ jar {
     enabled = false
 }
 
-task copyPrivate(type: Copy) {
+tasks.register('copyPrivate', Copy) {
     copy {
         from './PTCMR_yml'
         include "*.yml"

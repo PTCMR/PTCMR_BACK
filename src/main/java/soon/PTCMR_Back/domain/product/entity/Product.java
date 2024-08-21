@@ -18,7 +18,9 @@ import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
+import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
 import soon.PTCMR_Back.domain.team.entity.Team;
+import soon.PTCMR_Back.global.entity.BaseTimeEntity;
 
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,7 +28,7 @@ import soon.PTCMR_Back.domain.team.entity.Team;
 @SQLDelete(sql = "UPDATE product SET deleted = true WHERE id=?")
 @SQLRestriction("deleted = false")
 @Entity
-public class Product {
+public class Product extends BaseTimeEntity {
 
     @ToString.Exclude
     @Id
@@ -68,7 +70,7 @@ public class Product {
         this.expirationDate = request.getExpirationDate();
         this.quantity = request.getQuantity();
         this.status = ProductStatus.getProductStatus(request.getExpirationDate());
-        this.storageType = StorageType.valueOf(request.getStorageType());
+        this.storageType = StorageType.toStorageType(request.getStorageType());
         this.repurchase = request.isRepurchase();
         this.description = request.getDescription();
 
@@ -86,5 +88,15 @@ public class Product {
 
     public void delete() {
         this.deleted = true;
+    }
+
+    public void update(ProductUpdateRequest request) {
+        this.name = request.getName();
+        this.expirationDate = request.getExpirationDate();
+        this.quantity = request.getQuantity();
+        this.storageType = StorageType.valueOf(request.getStorageType());
+        this.repurchase = request.isRepurchase();
+        this.description = request.getDescription();
+        this.imageUrl = request.getImageUrl();
     }
 }
