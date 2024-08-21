@@ -18,7 +18,8 @@ import soon.PTCMR_Back.domain.team.dto.reqeust.TeamCreateRequest;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamUpdateRequest;
 import soon.PTCMR_Back.domain.team.dto.response.TeamDetails;
 import soon.PTCMR_Back.domain.team.entity.Team;
-import soon.PTCMR_Back.domain.team.repository.TeamRepository;
+import soon.PTCMR_Back.domain.team.repository.TeamJpaRepository;
+import soon.PTCMR_Back.global.exception.InvalidMemberException;
 import soon.PTCMR_Back.global.exception.TeamNotFoundException;
 import soon.PTCMR_Back.global.oauth.dto.UserDTO;
 
@@ -30,7 +31,7 @@ class TeamServiceTest {
 	@Autowired
 	private TeamService teamService;
 	@Autowired
-	private TeamRepository teamRepository;
+	private TeamJpaRepository teamRepository;
 	@Autowired
 	private MemberRepository memberRepository;
 
@@ -67,7 +68,7 @@ class TeamServiceTest {
 
 				Long id = teamService.create(user.uuid(), teamCreateRequest.title());
 
-				Team result = teamRepository.findById(id);
+				Team result = teamRepository.findById(id).orElseThrow();
 
 				assertThat(result).isNotNull();
 				assertThat(result.getId()).isEqualTo(id);
@@ -131,6 +132,60 @@ class TeamServiceTest {
 			void fail() {
 				assertThatThrownBy(
 					() -> teamService.update(999L, "test", 1L, 1L, "test")
+				).isInstanceOf(TeamNotFoundException.class);
+			}
+		}
+	}
+
+
+	@Nested
+	@DisplayName("delete 메서드는")
+	class Describe_delete{
+
+		@Nested
+		@DisplayName("올바른 요청을 받았을 때")
+		class Delete_success {
+
+			@Test
+			@DisplayName("deleted를 true로 바꾼다.")
+			void success() {
+
+				Long teamId = 2L;
+				String uuid = "kakao 1234";
+
+				teamService.delete(
+					teamId,
+					uuid
+				);
+
+				assertThat(teamRepository.findById(teamId)).isEmpty();
+			}
+		}
+
+
+		@Nested
+		@DisplayName("팀에 속하지 않은 멤버가 요청했을 때")
+		class Delete_InvalidMember_Expect_InvalidMemberException {
+
+			@Test
+			@DisplayName("InvalidMemberException 발생시킨다.")
+			void fail() {
+				assertThatThrownBy(
+					() -> teamService.delete(2L, "kakao 12345")
+				).isInstanceOf(InvalidMemberException.class);
+			}
+		}
+
+
+		@Nested
+		@DisplayName("삭제하려는 팀이 존재하지 않을 때")
+		class Delete_InvalidTeam_expect_TeamNotFoundException {
+
+			@Test
+			@DisplayName("TeamNotFoundException 발생시킨다.")
+			void fail() {
+				assertThatThrownBy(
+					() -> teamService.delete(999L, "kakao 12345")
 				).isInstanceOf(TeamNotFoundException.class);
 			}
 		}
