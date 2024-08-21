@@ -1,7 +1,7 @@
 package soon.PTCMR_Back.domain.team.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 import soon.PTCMR_Back.domain.member.MockUser;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamCreateRequest;
@@ -58,6 +59,14 @@ public class TeamControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(json))
 			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("[DELETE] /api/v1/team/{teamId} 요청 시 팀 삭제")
+	void delete() throws Exception {
+		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/v1/team/2"))
+			.andExpect(status().isNoContent())
 			.andDo(print());
 	}
 }
