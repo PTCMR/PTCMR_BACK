@@ -38,4 +38,13 @@ public class TeamService {
 
         return TeamDetails.from(team);
     }
+
+    @Transactional
+	public void delete(Long teamId, String uuid) {
+        Team team = teamRepository.findById(teamId);
+        Member member = memberRepository.findByUuid(uuid);
+
+        teamManager.verifyMemberInTeam(team, member);
+        teamRepository.delete(team);
+	}
 }

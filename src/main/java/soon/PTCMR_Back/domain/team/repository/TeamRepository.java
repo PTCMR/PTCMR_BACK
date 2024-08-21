@@ -24,4 +24,8 @@ public class TeamRepository {
             () -> new TeamNotFoundException()
         );
     }
+
+	public void delete(Team team) {
+        teamJpaRepository.delete(team);
+	}
 }
