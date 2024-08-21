@@ -37,3 +37,14 @@ include::{snippets}/team-create/request-fields.adoc[]
 === 응답
 
 include::{snippets}/team-create/http-response.adoc[]
+
+== 팀 변경
+
+=== 요청
+
+include::{snippets}/team-update/http-request.adoc[]
+include::{snippets}/team-update/request-fields.adoc[]
+
+=== 응답
+
+include::{snippets}/team-update/http-response.adoc[]
