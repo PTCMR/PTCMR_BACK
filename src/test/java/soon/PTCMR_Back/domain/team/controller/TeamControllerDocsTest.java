@@ -4,6 +4,8 @@ package soon.PTCMR_Back.domain.team.controller;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -20,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 import soon.PTCMR_Back.domain.member.MockUser;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamCreateRequest;
@@ -80,6 +83,20 @@ public class TeamControllerDocsTest {
 					fieldWithPath("notificationHour").description("알림날짜")
 				)));
 
+	}
+
+	@Test
+	@DisplayName("[DELETE] /api/v1/team/{teamId} 요청 시 팀 삭제")
+	void delete() throws Exception {
+		Long teamId = 2L;
+		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/v1/team/{teamId}", teamId))
+			.andExpect(status().isNoContent())
+			.andDo(print())
+			.andDo(document("team-delete",
+				pathParameters(
+					parameterWithName("teamId").description("팀 아이디")
+				)
+			));
 	}
 
 }
