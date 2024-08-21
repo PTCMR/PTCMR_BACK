@@ -1,6 +1,7 @@
 package soon.PTCMR_Back.domain.product.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -9,6 +10,8 @@ import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
+import soon.PTCMR_Back.domain.product.entity.StorageType;
+import soon.PTCMR_Back.global.annotation.ValidEnum;
 
 @ToString
 @AllArgsConstructor
@@ -20,7 +23,7 @@ public class ProductCreateRequest {
 
     @NotNull(message = "유통기간을 입력하세요.")
     @FutureOrPresent(message = "유통기간은 현재 시점 이후여야 합니다.")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
+    @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime expirationDate;
 
     @Positive(message = "수량을 입력하세요.")
@@ -29,7 +32,7 @@ public class ProductCreateRequest {
     @NotNull(message = "존재하지 않는 url 입니다.")
     private String imageUrl;
 
-    @NotEmpty(message = "보관방법을 입력하세요.")
+    @ValidEnum(message = "정확한 보관방법을 입력해주세요", verifyClass = StorageType.class, ignoreCase = true)
     private String storageType;
 
     private boolean repurchase;
