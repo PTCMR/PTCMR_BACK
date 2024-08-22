@@ -15,7 +15,7 @@ public class MockUser {
 			UserDTO.builder()
 				.name("test")
 				.provider(SocialType.KAKAO)
-				.uuid("kakao 123456")
+				.uuid("kakao 1234")
 				.build()
 		);
 

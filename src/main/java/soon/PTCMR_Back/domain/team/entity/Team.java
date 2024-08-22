@@ -41,8 +41,9 @@ public class Team extends BaseTimeEntity {
             .build();
     }
 
-    public void updateTitle(String title) {
-        this.title = title;
+    public void update(String newTitle, long notificationDay, long notificationHour) {
+        this.title = newTitle;
+        this.schedule.updateNotificationTime(notificationDay, notificationHour);
     }
 
     @Builder
@@ -50,4 +51,5 @@ public class Team extends BaseTimeEntity {
         this.title = title;
         this.schedule = schedule;
     }
+
 }
