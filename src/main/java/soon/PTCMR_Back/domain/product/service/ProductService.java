@@ -19,7 +19,7 @@ public class ProductService {
 
     @Transactional
     public Long create(ProductCreateRequest request) {
-        boolean exists = teamRepository.existsById(request.getTeamId());
+        boolean exists = teamRepository.existsById(request.teamId());
 
         if (!exists) {
             throw new TeamNotFoundException();

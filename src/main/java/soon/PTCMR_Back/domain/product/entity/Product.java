@@ -66,17 +66,16 @@ public class Product extends BaseTimeEntity {
     private Team team;
 
     private Product(ProductCreateRequest request) {
-        this.name = request.getName();
-        this.expirationDate = request.getExpirationDate();
-        this.quantity = request.getQuantity();
-        this.status = ProductStatus.getProductStatus(request.getExpirationDate());
-        this.storageType = StorageType.toStorageType(request.getStorageType());
-        this.repurchase = request.isRepurchase();
-        this.description = request.getDescription();
+        this.name = request.name();
+        this.expirationDate = request.expirationDate();
+        this.quantity = request.quantity();
+        this.status = ProductStatus.getProductStatus(request.expirationDate());
+        this.storageType = StorageType.toStorageType(request.storageType());
+        this.repurchase = request.repurchase();
+        this.description = request.description();
 
         // TODO S3 연동 후 변겅
-        this.imageUrl =
-            request.getImageUrl().isEmpty() ? "default image url" : request.getImageUrl();
+        this.imageUrl = request.imageUrl().isEmpty() ? "default image url" : request.imageUrl();
 
         // TODO Team 구현 후 변경
         this.team = team;
@@ -91,12 +90,12 @@ public class Product extends BaseTimeEntity {
     }
 
     public void update(ProductUpdateRequest request) {
-        this.name = request.getName();
-        this.expirationDate = request.getExpirationDate();
-        this.quantity = request.getQuantity();
-        this.status = ProductStatus.getProductStatus(request.getExpirationDate());
-        this.storageType = StorageType.valueOf(request.getStorageType());
-        this.repurchase = request.isRepurchase();
-        this.description = request.getDescription();
+        this.name = request.name();
+        this.expirationDate = request.expirationDate();
+        this.quantity = request.quantity();
+        this.status = ProductStatus.getProductStatus(request.expirationDate());
+        this.storageType = StorageType.valueOf(request.storageType());
+        this.repurchase = request.repurchase();
+        this.description = request.description();
     }
 }

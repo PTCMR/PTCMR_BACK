@@ -47,8 +47,8 @@ class ProductServiceTest {
         assertThat(productJpaRepository.count()).isEqualTo(1);
 
         Product product = productJpaRepository.findAll().getFirst();
-        Assertions.assertEquals(request.getName(), product.getName());
-        Assertions.assertEquals(request.getQuantity(), product.getQuantity());
+        Assertions.assertEquals(request.name(), product.getName());
+        Assertions.assertEquals(request.quantity(), product.getQuantity());
 
         Assertions.assertEquals(ProductStatus.YELLOW, product.getStatus());
     }
@@ -57,6 +57,7 @@ class ProductServiceTest {
     @DisplayName("상품 삭제")
     void delete() {
         Product product = createProduct();
+        productJpaRepository.save(product);
 
         productService.delete(product.getId());
 
