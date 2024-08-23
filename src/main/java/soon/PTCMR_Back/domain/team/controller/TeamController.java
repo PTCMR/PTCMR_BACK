@@ -5,11 +5,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamCreateRequest;
+import soon.PTCMR_Back.domain.team.dto.reqeust.TeamUpdateRequest;
+import soon.PTCMR_Back.domain.team.dto.response.TeamDetails;
 import soon.PTCMR_Back.domain.team.service.TeamService;
 import soon.PTCMR_Back.global.oauth.CustomOAuth2User;
 
@@ -27,5 +32,29 @@ public class TeamController {
 	) {
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(teamService.create(teamCreateRequest.title(), user.getUUID()));
+	}
+
+	@PutMapping
+	public ResponseEntity<TeamDetails> updateTeam(
+		@RequestBody final TeamUpdateRequest teamUpdateRequest,
+		@AuthenticationPrincipal CustomOAuth2User user
+	) {
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(teamService.update(
+				teamUpdateRequest.teamId(),
+				teamUpdateRequest.newTitle(),
+				teamUpdateRequest.notificationDay(),
+				teamUpdateRequest.notificationHour(),
+				user.getUUID()
+			));
+	}
+
+	@DeleteMapping("/{teamId}")
+	public ResponseEntity<Void> deleteTeam(
+		@PathVariable final Long teamId,
+		@AuthenticationPrincipal CustomOAuth2User user
+	){
+		teamService.delete(teamId, user.getUUID());
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }

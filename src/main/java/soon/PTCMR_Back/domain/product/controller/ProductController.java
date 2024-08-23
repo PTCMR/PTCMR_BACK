@@ -41,14 +41,11 @@ public class ProductController {
     }
 
     @PatchMapping("/product/{productId}")
-    public ResponseEntity<Void> update(@PathVariable Long productId,
-        @RequestBody @Valid ProductUpdateRequest request) {
-        productService.update(productId, request);
-
-        String url = "/api/v1/product/" + productId;
-
+    public ResponseEntity<Void> update(@PathVariable Long productId, @RequestBody @Valid ProductUpdateRequest request) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create(url));
+        headers.setLocation(URI.create("/api/v1/product/" + productId));
+
+        productService.update(productId, request);
 
         return ResponseEntity.status(HttpStatus.FOUND).headers(headers).build();
     }

@@ -1,10 +1,10 @@
 package soon.PTCMR_Back.domain.product.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
 
 import java.time.LocalDateTime;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,17 +47,16 @@ class ProductServiceTest {
         assertThat(productJpaRepository.count()).isEqualTo(1);
 
         Product product = productJpaRepository.findAll().getFirst();
-        assertEquals(request.getName(), product.getName());
-        assertEquals(request.getQuantity(), product.getQuantity());
+        Assertions.assertEquals(request.getName(), product.getName());
+        Assertions.assertEquals(request.getQuantity(), product.getQuantity());
 
-        assertEquals(ProductStatus.YELLOW, product.getStatus());
+        Assertions.assertEquals(ProductStatus.YELLOW, product.getStatus());
     }
 
     @Test
     @DisplayName("상품 삭제")
     void delete() {
         Product product = createProduct();
-        productJpaRepository.save(product);
 
         productService.delete(product.getId());
 

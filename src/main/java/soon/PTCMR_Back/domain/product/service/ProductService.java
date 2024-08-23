@@ -39,8 +39,9 @@ public class ProductService {
 
     @Transactional
     public void update(Long productId, ProductUpdateRequest request) {
-        //TODO Team 인증 기능 추가 해야함
+        // TODO 팀에 속한 멤버가 요청 했는지 인증 로직 추가
         Product product = productRepository.findById(productId);
+
         product.update(request);
     }
 }
