@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.time.LocalDateTime;
+import soon.PTCMR_Back.domain.product.entity.StorageType;
+import soon.PTCMR_Back.global.annotation.ValidEnum;
 
 public record ProductUpdateRequest(
 
@@ -23,7 +25,7 @@ public record ProductUpdateRequest(
     @NotNull(message = "존재하지 않는 url 입니다.")
     String imageUrl,
 
-    @NotEmpty(message = "보관방법을 입력하세요.")
+    @ValidEnum(message = "정확한 보관방법을 입력해주세요", verifyClass = StorageType.class, ignoreCase = true)
     String storageType,
 
     boolean repurchase,

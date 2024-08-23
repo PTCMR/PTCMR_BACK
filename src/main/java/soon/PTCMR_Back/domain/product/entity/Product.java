@@ -22,7 +22,6 @@ import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
 import soon.PTCMR_Back.domain.team.entity.Team;
 import soon.PTCMR_Back.global.entity.BaseTimeEntity;
 
-@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @SQLDelete(sql = "UPDATE product SET deleted = true WHERE id=?")
@@ -94,7 +93,7 @@ public class Product extends BaseTimeEntity {
         this.expirationDate = request.expirationDate();
         this.quantity = request.quantity();
         this.status = ProductStatus.getProductStatus(request.expirationDate());
-        this.storageType = StorageType.valueOf(request.storageType());
+        this.storageType = StorageType.toStorageType(request.storageType());
         this.repurchase = request.repurchase();
         this.description = request.description();
     }

@@ -20,27 +20,27 @@ import soon.PTCMR_Back.domain.product.service.ProductService;
 
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/product")
 @RestController
 public class ProductController {
 
     private final ProductService productService;
 
-    @PostMapping("/product")
+    @PostMapping
     public ResponseEntity<Long> create(@RequestBody @Valid ProductCreateRequest request) {
         Long productId = productService.create(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(productId);
     }
 
-    @DeleteMapping("/product/{productId}")
+    @DeleteMapping("/{productId}")
     public ResponseEntity<Void> delete(@PathVariable Long productId) {
         productService.delete(productId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PatchMapping("/product/{productId}")
+    @PatchMapping("/{productId}")
     public ResponseEntity<Void> update(@PathVariable Long productId, @RequestBody @Valid ProductUpdateRequest request) {
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/api/v1/product/" + productId));
