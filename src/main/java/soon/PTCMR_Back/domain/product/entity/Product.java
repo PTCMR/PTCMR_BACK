@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
@@ -29,7 +28,6 @@ import soon.PTCMR_Back.global.entity.BaseTimeEntity;
 @Entity
 public class Product extends BaseTimeEntity {
 
-    @ToString.Exclude
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -1,10 +1,11 @@
 package soon.PTCMR_Back.domain.product.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
 
 import java.time.LocalDateTime;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
+import soon.PTCMR_Back.domain.product.dto.response.ProductDetailResponse;
 import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.product.entity.ProductStatus;
 import soon.PTCMR_Back.domain.product.entity.StorageType;
@@ -47,10 +49,10 @@ class ProductServiceTest {
         assertThat(productJpaRepository.count()).isEqualTo(1);
 
         Product product = productJpaRepository.findAll().getFirst();
-        Assertions.assertEquals(request.name(), product.getName());
-        Assertions.assertEquals(request.quantity(), product.getQuantity());
+        assertEquals(request.name(), product.getName());
+        assertEquals(request.quantity(), product.getQuantity());
 
-        Assertions.assertEquals(ProductStatus.YELLOW, product.getStatus());
+        assertEquals(ProductStatus.YELLOW, product.getStatus());
     }
 
     @Test
@@ -87,5 +89,26 @@ class ProductServiceTest {
         // then
         assertThat(newName).isEqualTo(updatedProduct.getName());
         assertThat(quantity).isEqualTo(updatedProduct.getQuantity());
+    }
+
+    @Test
+    @DisplayName("상품 단건 조회")
+    void detailProduct() {
+        // given
+        Product product = createProduct();
+        productJpaRepository.save(product);
+
+        // when
+        ProductDetailResponse detail = productService.detail(product.getId());
+
+        // then
+        assertThat(detail.name()).isEqualTo(product.getName());
+        assertThat(detail.quantity()).isEqualTo(product.getQuantity());
+        assertThat(detail.imageUrl()).isEqualTo(product.getImageUrl());
+        assertThat(StorageType.valueOf(detail.storageType())).isEqualTo(product.getStorageType());
+        assertThat(detail.repurchase()).isEqualTo(product.isRepurchase());
+        assertThat(detail.description()).isEqualTo(product.getDescription());
+        assertThat(ProductStatus.valueOf(detail.status())).isEqualTo(product.getStatus());
+        assertThat(detail.expirationDate()).isEqualTo(product.getExpirationDate());
     }
 }

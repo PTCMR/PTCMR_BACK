@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
+import soon.PTCMR_Back.domain.product.dto.response.ProductDetailResponse;
 import soon.PTCMR_Back.domain.product.service.ProductService;
 
 @RequiredArgsConstructor
@@ -41,12 +43,20 @@ public class ProductController {
     }
 
     @PatchMapping("/{productId}")
-    public ResponseEntity<Void> update(@PathVariable Long productId, @RequestBody @Valid ProductUpdateRequest request) {
+    public ResponseEntity<Void> update(@PathVariable Long productId,
+        @RequestBody @Valid ProductUpdateRequest request) {
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/api/v1/product/" + productId));
 
         productService.update(productId, request);
 
         return ResponseEntity.status(HttpStatus.FOUND).headers(headers).build();
+    }
+
+    @GetMapping("/{productId}")
+    public ResponseEntity<ProductDetailResponse> detail(@PathVariable Long productId) {
+        ProductDetailResponse detail = productService.detail(productId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(detail);
     }
 }

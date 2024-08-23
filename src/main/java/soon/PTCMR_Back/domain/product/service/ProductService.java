@@ -1,10 +1,11 @@
 package soon.PTCMR_Back.domain.product.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
+import soon.PTCMR_Back.domain.product.dto.response.ProductDetailResponse;
 import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.product.repository.ProductRepository;
 import soon.PTCMR_Back.domain.team.repository.TeamRepository;
@@ -43,5 +44,12 @@ public class ProductService {
         Product product = productRepository.findById(productId);
 
         product.update(request);
+    }
+
+    @Transactional(readOnly = true)
+    public ProductDetailResponse detail(Long productId) {
+        Product product = productRepository.findById(productId);
+
+        return ProductDetailResponse.from(product);
     }
 }
