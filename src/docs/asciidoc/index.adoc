@@ -40,37 +40,15 @@ include::{snippets}/product-update/path-parameters.adoc[]
 === 응답
 
 include::{snippets}/product-update/http-response.adoc[]
-=======
 
 == 팀 생성
 
 === 요청
 
 include::{snippets}/team-create/http-request.adoc[]
+
 include::{snippets}/team-create/request-fields.adoc[]
 
 === 응답
 
 include::{snippets}/team-create/http-response.adoc[]
-
-== 팀 변경
-
-=== 요청
-
-include::{snippets}/team-update/http-request.adoc[]
-include::{snippets}/team-update/request-fields.adoc[]
-
-=== 응답
-
-include::{snippets}/team-update/http-response.adoc[]
-
-==팀 삭제
-
-=== 요청
-
-include::{snippets}/team-delete/http-request.adoc[]
-include::{snippets}/team-delete/path-parameters.adoc[]
-
-=== 응답
-
-include::{snippets}/team-delete/http-response.adoc[]

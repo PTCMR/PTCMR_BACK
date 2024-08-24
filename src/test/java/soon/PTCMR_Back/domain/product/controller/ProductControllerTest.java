@@ -1,14 +1,18 @@
 package soon.PTCMR_Back.domain.product.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,7 +58,7 @@ class ProductControllerTest {
 
         // expected
         mockMvc.perform(post("/api/v1/product")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(json))
             .andExpect(status().isCreated())
             .andDo(print());
@@ -69,7 +73,7 @@ class ProductControllerTest {
 
         // expected
         mockMvc.perform(delete("/api/v1/product/{productId}", product.getId())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
             .andExpect(status().isNoContent())
             .andDo(print());
     }
@@ -93,10 +97,32 @@ class ProductControllerTest {
 
         // expected
         mockMvc.perform(patch("/api/v1/product/{productId}", product.getId())
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(json)
             )
             .andExpect(status().isFound())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("[GET] /product/{productId}} 요청 시 상품 단건 조회")
+    void detail() throws Exception {
+        // given
+        Product product = createProduct();
+        productJpaRepository.save(product);
+
+        // expected
+        mockMvc.perform(get("/api/v1/product/{productId}", product.getId())
+                .contentType(APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.name").value(product.getName()))
+            .andExpect(jsonPath("$.expirationDate").value(product.getExpirationDate().toString()))
+            .andExpect(jsonPath("$.quantity").value(product.getQuantity()))
+            .andExpect(jsonPath("$.imageUrl").value(product.getImageUrl()))
+            .andExpect(jsonPath("$.status").value(product.getStatus().toString()))
+            .andExpect(jsonPath("$.storageType").value(product.getStorageType().toString()))
+            .andExpect(jsonPath("$.repurchase").value(product.isRepurchase()))
+            .andExpect(jsonPath("$.description").value(product.getDescription()))
             .andDo(print());
     }
 }
