@@ -9,9 +9,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
-class TeamInviteGeneratorTest {
+class InviteCodeGeneratorTest {
 
-	InviteGenerator inviteGenerator = new TeamInviteGenerator();
+	InviteGenerator inviteGenerator = new InviteCodeGenerator();
 	static Set<String> set = ConcurrentHashMap.newKeySet();
 
 	@Test
@@ -21,10 +21,11 @@ class TeamInviteGeneratorTest {
 	}
 
 	@RepeatedTest(10)
+	@DisplayName("10만번 돌렸을 때 중복 확인")
 	void test1() throws InterruptedException {
 		ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < 100000; i++) {
 			executorService.submit(() -> {
 					set.add(inviteGenerator.createInviteCode());
 				}
