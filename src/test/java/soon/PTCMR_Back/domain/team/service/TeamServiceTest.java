@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import jakarta.transaction.Transactional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import soon.PTCMR_Back.domain.member.entity.Member;
 import soon.PTCMR_Back.domain.member.entity.SocialType;
 import soon.PTCMR_Back.domain.member.repository.MemberRepository;
@@ -22,6 +25,7 @@ import soon.PTCMR_Back.domain.team.repository.TeamJpaRepository;
 import soon.PTCMR_Back.global.exception.InvalidMemberException;
 import soon.PTCMR_Back.global.exception.TeamNotFoundException;
 import soon.PTCMR_Back.global.oauth.dto.UserDTO;
+import soon.PTCMR_Back.global.util.invite.InviteGenerator;
 
 @SpringBootTest
 @DisplayName("TeamService 클래스")
@@ -34,6 +38,8 @@ class TeamServiceTest {
 	private TeamJpaRepository teamRepository;
 	@Autowired
 	private MemberRepository memberRepository;
+	@Autowired
+	private InviteGenerator inviteGenerator;
 
 	@Nested
 	@DisplayName("create 메서드는")
@@ -47,6 +53,7 @@ class TeamServiceTest {
 
 
 		@BeforeEach
+		@Rollback(value = false)
 		void setUp() {
 			memberRepository.save(
 				Member.create(user.uuid(), user.name(), "default", SocialType.KAKAO));
@@ -72,10 +79,31 @@ class TeamServiceTest {
 
 				assertThat(result).isNotNull();
 				assertThat(result.getId()).isEqualTo(id);
+				assertThat(result.getInviteCode()).isNotNull();
 				assertThat(result.getTitle()).isEqualTo(teamCreateRequest.title());
 				assertThat(result.getCreateTime()).isNotNull();
 				assertThat(result.getSchedule().getDay()).isEqualTo(7);
 				assertThat(result.getSchedule().getHour()).isEqualTo(12);
+			}
+		}
+
+		@Nested
+		@DisplayName("만약 10000번 호출했을때")
+		@Rollback(false)
+		class Create_Bulk_Request{
+
+			@Test
+			@DisplayName("성공한다면")
+			void success(){
+				int threads = 10;
+				ExecutorService es = Executors.newFixedThreadPool(threads);
+
+				for(int i = 0 ; i < threads ; i++){
+					int index = i;
+					es.submit(() ->{
+						teamService.create(user.uuid(), "title" + index);
+					});
+				}
 			}
 		}
 	}
@@ -91,7 +119,7 @@ class TeamServiceTest {
 
 			@BeforeEach
 			void setUp() {
-				teamRepository.save(Team.create("test"));
+				teamRepository.save(Team.create("test", inviteGenerator.createInviteCode()));
 			}
 
 			@Test
@@ -179,7 +207,7 @@ class TeamServiceTest {
 
 		@Nested
 		@DisplayName("삭제하려는 팀이 존재하지 않을 때")
-		class Delete_InvalidTeam_expect_TeamNotFoundException {
+		class Delete_InvalidTeam_Expect_TeamNotFoundException {
 
 			@Test
 			@DisplayName("TeamNotFoundException 발생시킨다.")
