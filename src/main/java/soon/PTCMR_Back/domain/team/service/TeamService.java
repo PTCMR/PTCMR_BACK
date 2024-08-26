@@ -49,4 +49,12 @@ public class TeamService {
         teamManager.verifyMemberInTeam(team, member);
         teamRepository.delete(team);
 	}
+
+    public void invite(String uuid, String inviteCode) {
+        Member member = memberRepository.findByUuid(uuid);
+        Team team = teamRepository.findByInviteCode(inviteCode);
+
+        teamManager.validateMemberInTeam(team, member);
+        teamManager.joinTeam(team, member);
+    }
 }
