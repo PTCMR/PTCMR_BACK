@@ -5,6 +5,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +18,7 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 import soon.PTCMR_Back.domain.member.MockUser;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamCreateRequest;
+import soon.PTCMR_Back.domain.team.dto.reqeust.TeamInviteRequest;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamUpdateRequest;
 
 @AutoConfigureMockMvc(addFilters = false)
@@ -39,7 +41,7 @@ public class TeamControllerTest {
 	void create() throws Exception {
 		TeamCreateRequest teamCreateRequest = new TeamCreateRequest("test");
 
-		String json = objectMapper.writeValueAsString(teamCreateRequest);
+		String json = getJson(teamCreateRequest);
 
 		mockMvc.perform(post("/api/v1/team")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -53,7 +55,7 @@ public class TeamControllerTest {
 	@DisplayName("[PUT] api/v1/team 요청 시 팀 업데이트")
 	void update() throws Exception {
 		TeamUpdateRequest teamUpdateRequest = new TeamUpdateRequest(2L, "TestUpdate", 5L, 12L);
-		String json = objectMapper.writeValueAsString(teamUpdateRequest);
+		String json = getJson(teamUpdateRequest);
 
 		mockMvc.perform(put("/api/v1/team")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -68,5 +70,23 @@ public class TeamControllerTest {
 		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/v1/team/2"))
 			.andExpect(status().isNoContent())
 			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("[POST] /api/v1/team/invite 요청 시 팀 생성")
+	void invite() throws Exception {
+
+		String json = getJson(new TeamInviteRequest("XTLRqNyw"));
+
+		mockMvc.perform(post("/api/v1/team/invite")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(json))
+			.andExpect(status().isNoContent())
+			.andDo(print());
+
+	}
+
+	private String getJson(Object inviteCode) throws JsonProcessingException {
+		return objectMapper.writeValueAsString(inviteCode);
 	}
 }
