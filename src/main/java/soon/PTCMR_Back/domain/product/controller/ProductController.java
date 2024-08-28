@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
+import soon.PTCMR_Back.domain.product.dto.request.ProductPaginationRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
 import soon.PTCMR_Back.domain.product.dto.response.ProductDetailResponse;
+import soon.PTCMR_Back.domain.product.dto.response.ProductPaginationResponseWrapper;
 import soon.PTCMR_Back.domain.product.service.ProductService;
 
 @RequiredArgsConstructor
@@ -58,5 +60,13 @@ public class ProductController {
         ProductDetailResponse detail = productService.detail(productId);
 
         return ResponseEntity.status(HttpStatus.OK).body(detail);
+    }
+
+    @GetMapping
+    public ResponseEntity<ProductPaginationResponseWrapper> getPaginatedProducts(
+        @RequestBody ProductPaginationRequest request) {
+        ProductPaginationResponseWrapper paginatedProducts = productService.getPaginatedProducts(request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(paginatedProducts);
     }
 }

@@ -52,6 +52,13 @@ include::{snippets}/team-create/request-fields.adoc[]
 === 응답
 
 include::{snippets}/team-create/http-response.adoc[]
+=======
+
+include::{snippets}/team-create/request-fields.adoc[]
+
+=== 응답
+
+include::{snippets}/team-create/http-response.adoc[]
 
 == 팀 수정
 

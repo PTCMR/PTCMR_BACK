@@ -3,25 +3,30 @@ package soon.PTCMR_Back.domain.product.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
+import static soon.PTCMR_Back.domain.product.entity.ProductTest.pagingSetUp;
 
 import java.time.LocalDateTime;
-import org.assertj.core.api.Assertions;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import soon.PTCMR_Back.domain.product.dto.ProductPaginationDto;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
+import soon.PTCMR_Back.domain.product.dto.request.ProductPaginationRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
 import soon.PTCMR_Back.domain.product.dto.response.ProductDetailResponse;
+import soon.PTCMR_Back.domain.product.dto.response.ProductPaginationResponseWrapper;
 import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.product.entity.ProductStatus;
 import soon.PTCMR_Back.domain.product.entity.StorageType;
 import soon.PTCMR_Back.domain.product.repository.ProductJpaRepository;
+import soon.PTCMR_Back.domain.product.repository.ProductPaginationRepository;
 
 
 @SpringBootTest
-class ProductServiceTest {
+public class ProductServiceTest {
 
     @Autowired
     ProductJpaRepository productJpaRepository;
@@ -110,5 +115,57 @@ class ProductServiceTest {
         assertThat(detail.description()).isEqualTo(product.getDescription());
         assertThat(ProductStatus.valueOf(detail.status())).isEqualTo(product.getStatus());
         assertThat(detail.expirationDate()).isEqualTo(product.getExpirationDate());
+    }
+
+    @Test
+    @DisplayName("상품 페이징 - 첫 페이지")
+    void productPaginationFirstPage() {
+        // given
+        List<Product> pagingSetUp = pagingSetUp();
+        productJpaRepository.saveAll(pagingSetUp);
+
+        Long lastProductId = null;
+        String sortOption = "CREATE_DATE_DESC";
+        String category = "";
+
+        ProductPaginationRequest request = new ProductPaginationRequest(lastProductId, sortOption,
+            category);
+
+        // when
+        ProductPaginationResponseWrapper paginatedProducts = productService.getPaginatedProducts(
+            request);
+        List<ProductPaginationDto> products = paginatedProducts.products();
+        boolean hasNext = paginatedProducts.hasNext();
+
+        // then
+        assertThat(paginatedProducts).isNotNull();
+        assertThat(hasNext).isTrue();
+        assertThat(products.size()).isEqualTo(ProductPaginationRepository.PAGE_SIZE);
+    }
+
+    @Test
+    @DisplayName("상품 페이징 - 마지막 페이지")
+    void productPaginationLastPage() {
+        // given
+        List<Product> pagingSetUp = pagingSetUp();
+        productJpaRepository.saveAll(pagingSetUp);
+
+        Long lastProductId = 10L;
+        String sortOption = "CREATE_DATE_DESC";
+        String category = "";
+
+        ProductPaginationRequest request = new ProductPaginationRequest(lastProductId, sortOption,
+            category);
+
+        // when
+        ProductPaginationResponseWrapper paginatedProducts = productService.getPaginatedProducts(
+            request);
+        List<ProductPaginationDto> products = paginatedProducts.products();
+        boolean hasNext = paginatedProducts.hasNext();
+
+        // then
+        assertThat(paginatedProducts).isNotNull();
+        assertThat(hasNext).isFalse();
+        assertThat(products.size()).isEqualTo(ProductPaginationRepository.PAGE_SIZE);
     }
 }
