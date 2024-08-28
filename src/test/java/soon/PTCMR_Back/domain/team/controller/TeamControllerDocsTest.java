@@ -26,6 +26,7 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 import soon.PTCMR_Back.domain.member.MockUser;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamCreateRequest;
+import soon.PTCMR_Back.domain.team.dto.reqeust.TeamInviteRequest;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamUpdateRequest;
 
 @AutoConfigureRestDocs(uriScheme = "https", uriHost = "dns-name.com", uriPort = 443)
@@ -97,6 +98,24 @@ public class TeamControllerDocsTest {
 					parameterWithName("teamId").description("팀 아이디")
 				)
 			));
+	}
+
+	@Test
+	@DisplayName("[POST] /api/v1/team/invite 요청 시 팀 생성")
+	void invite() throws Exception {
+
+		String json = objectMapper.writeValueAsString(new TeamInviteRequest("XTLRqNyw"));
+
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/team/invite")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(json))
+			.andExpect(status().isNoContent())
+			.andDo(print())
+			.andDo(document("team-invite",
+				requestFields(
+					fieldWithPath("inviteCode").description("초대 코드")
+				)));
+
 	}
 
 }

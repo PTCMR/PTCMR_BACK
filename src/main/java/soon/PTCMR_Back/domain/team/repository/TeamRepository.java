@@ -28,4 +28,10 @@ public class TeamRepository {
 	public void delete(Team team) {
         teamJpaRepository.delete(team);
 	}
+
+    public Team findByInviteCode(String inviteCode) {
+        return teamJpaRepository.findByInviteCode(inviteCode).orElseThrow(
+            () -> new TeamNotFoundException()
+        );
+    }
 }

@@ -2,7 +2,6 @@ package soon.PTCMR_Back.domain.product.controller;
 
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +19,6 @@ import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductPaginationRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
 import soon.PTCMR_Back.domain.product.dto.response.ProductDetailResponse;
-import soon.PTCMR_Back.domain.product.dto.ProductPaginationDto;
 import soon.PTCMR_Back.domain.product.dto.response.ProductPaginationResponseWrapper;
 import soon.PTCMR_Back.domain.product.service.ProductService;
 
