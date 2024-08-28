@@ -40,10 +40,10 @@ class TeamServiceTest {
 	@Autowired
 	private InviteGenerator inviteGenerator;
 
-	UserDTO user
-		;
+	UserDTO user;
+
 	@BeforeEach
-	 void setUp() {
+	void setUp() {
 		user = UserDTO.builder()
 			.name("test")
 			.provider(SocialType.KAKAO)
@@ -113,11 +113,12 @@ class TeamServiceTest {
 				String uuid = "kakao 1234";
 
 				TeamDetails result = teamService.update(
+					uuid,
 					teamUpdateRequest.teamId(),
 					teamUpdateRequest.newTitle(),
 					teamUpdateRequest.notificationDay(),
-					teamUpdateRequest.notificationHour(),
-					uuid);
+					teamUpdateRequest.notificationHour()
+					);
 
 				assertThat(result.teamId()).isEqualTo(teamUpdateRequest.teamId());
 				assertThat(result.title()).isEqualTo(teamUpdateRequest.newTitle());
@@ -136,7 +137,7 @@ class TeamServiceTest {
 			@DisplayName("TeamNotFoundException 발생시킨다")
 			void fail() {
 				assertThatThrownBy(
-					() -> teamService.update(999L, "test", 1L, 1L, "test")
+					() -> teamService.update("test", 999L, "test", 1L, 1L)
 				).isInstanceOf(TeamNotFoundException.class);
 			}
 		}
@@ -159,8 +160,8 @@ class TeamServiceTest {
 				String uuid = "kakao 1234";
 
 				teamService.delete(
-					teamId,
-					uuid
+					uuid,
+					teamId
 				);
 
 				assertThat(teamRepository.findById(teamId)).isEmpty();
@@ -176,7 +177,7 @@ class TeamServiceTest {
 			@DisplayName("InvalidMemberException 발생시킨다.")
 			void fail() {
 				assertThatThrownBy(
-					() -> teamService.delete(2L, "kakao 12345")
+					() -> teamService.delete("kakao 12345", 2L)
 				).isInstanceOf(InvalidMemberException.class);
 			}
 		}
@@ -190,7 +191,7 @@ class TeamServiceTest {
 			@DisplayName("TeamNotFoundException 발생시킨다.")
 			void fail() {
 				assertThatThrownBy(
-					() -> teamService.delete(999L, "kakao 12345")
+					() -> teamService.delete("kakao 12345", 999L)
 				).isInstanceOf(TeamNotFoundException.class);
 			}
 		}

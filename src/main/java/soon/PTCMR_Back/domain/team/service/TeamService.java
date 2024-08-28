@@ -33,11 +33,10 @@ public class TeamService {
 
     @Transactional
     public TeamDetails update(String uuid, Long teamId, String newTitle, long notificationDay, long notificationHour) {
-        if(!memberRepository.existByUuid(uuid)){
-            throw new MemberNotFoundException();
-        }
-
+        Member member = memberRepository.findByUuid(uuid);
         Team team = teamRepository.findById(teamId);
+
+        teamManager.validateTeamAccess(team, member);
         team.update(newTitle, notificationDay, notificationHour);
 
 
@@ -49,7 +48,7 @@ public class TeamService {
         Member member = memberRepository.findByUuid(uuid);
         Team team = teamRepository.findById(teamId);
 
-        teamManager.verifyMemberInTeam(team, member);
+        teamManager.validateTeamAccess(team, member);
         teamRepository.delete(team);
 	}
 
@@ -58,7 +57,7 @@ public class TeamService {
         Member member = memberRepository.findByUuid(uuid);
         Team team = teamRepository.findByInviteCode(inviteCode);
 
-        teamManager.validateMemberInTeam(team, member);
+        teamManager.verifyMemberInTeam(team, member);
         teamManager.joinTeam(team, member);
     }
 }
