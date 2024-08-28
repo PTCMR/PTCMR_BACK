@@ -8,6 +8,7 @@ import soon.PTCMR_Back.domain.member.repository.MemberRepository;
 import soon.PTCMR_Back.domain.team.dto.response.TeamDetails;
 import soon.PTCMR_Back.domain.team.entity.Team;
 import soon.PTCMR_Back.domain.team.repository.TeamRepository;
+import soon.PTCMR_Back.global.exception.MemberNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +32,11 @@ public class TeamService {
     }
 
     @Transactional
-    public TeamDetails update(Long teamId, String newTitle, long notificationDay, long notificationHour, String uuid) {
+    public TeamDetails update(String uuid, Long teamId, String newTitle, long notificationDay, long notificationHour) {
+        if(!memberRepository.existByUuid(uuid)){
+            throw new MemberNotFoundException();
+        }
+
         Team team = teamRepository.findById(teamId);
         team.update(newTitle, notificationDay, notificationHour);
 
@@ -40,9 +45,9 @@ public class TeamService {
     }
 
     @Transactional
-	public void delete(Long teamId, String uuid) {
-        Team team = teamRepository.findById(teamId);
+	public void delete(String uuid, Long teamId) {
         Member member = memberRepository.findByUuid(uuid);
+        Team team = teamRepository.findById(teamId);
 
         teamManager.verifyMemberInTeam(team, member);
         teamRepository.delete(team);

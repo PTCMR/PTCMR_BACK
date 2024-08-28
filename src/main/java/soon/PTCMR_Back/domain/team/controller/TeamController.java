@@ -27,34 +27,34 @@ public class TeamController {
 
 	@PostMapping
 	public ResponseEntity<Long> createTeam(
-		@RequestBody final TeamCreateRequest teamCreateRequest,
-		@AuthenticationPrincipal CustomOAuth2User user
+		@AuthenticationPrincipal final CustomOAuth2User user,
+		@RequestBody final TeamCreateRequest teamCreateRequest
 	) {
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(teamService.create(teamCreateRequest.title(), user.getUUID()));
+			.body(teamService.create(user.getUUID(), teamCreateRequest.title()));
 	}
 
 	@PutMapping
 	public ResponseEntity<TeamDetails> updateTeam(
-		@RequestBody final TeamUpdateRequest teamUpdateRequest,
-		@AuthenticationPrincipal CustomOAuth2User user
+		@AuthenticationPrincipal final CustomOAuth2User user,
+		@RequestBody final TeamUpdateRequest teamUpdateRequest
 	) {
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(teamService.update(
+				user.getUUID(),
 				teamUpdateRequest.teamId(),
 				teamUpdateRequest.newTitle(),
 				teamUpdateRequest.notificationDay(),
-				teamUpdateRequest.notificationHour(),
-				user.getUUID()
+				teamUpdateRequest.notificationHour()
 			));
 	}
 
 	@DeleteMapping("/{teamId}")
 	public ResponseEntity<Void> deleteTeam(
-		@PathVariable final Long teamId,
-		@AuthenticationPrincipal CustomOAuth2User user
+		@AuthenticationPrincipal final CustomOAuth2User user,
+		@PathVariable final Long teamId
 	){
-		teamService.delete(teamId, user.getUUID());
+		teamService.delete(user.getUUID(), teamId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }
