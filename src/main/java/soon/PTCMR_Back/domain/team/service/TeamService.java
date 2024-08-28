@@ -50,6 +50,7 @@ public class TeamService {
         teamRepository.delete(team);
 	}
 
+    @Transactional
     public void invite(String uuid, String inviteCode) {
         Member member = memberRepository.findByUuid(uuid);
         Team team = teamRepository.findByInviteCode(inviteCode);

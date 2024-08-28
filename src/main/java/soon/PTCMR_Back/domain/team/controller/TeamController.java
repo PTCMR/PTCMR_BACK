@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamCreateRequest;
+import soon.PTCMR_Back.domain.team.dto.reqeust.TeamInviteRequest;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamUpdateRequest;
 import soon.PTCMR_Back.domain.team.dto.response.TeamDetails;
 import soon.PTCMR_Back.domain.team.service.TeamService;
@@ -55,6 +56,15 @@ public class TeamController {
 		@AuthenticationPrincipal CustomOAuth2User user
 	){
 		teamService.delete(teamId, user.getUUID());
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+	@PostMapping("/invite")
+	public ResponseEntity<Void> inviteTeam(
+		@RequestBody final TeamInviteRequest inviteCode,
+		@AuthenticationPrincipal CustomOAuth2User user
+	){
+		teamService.invite(user.getUUID(), inviteCode.inviteCode());
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }
