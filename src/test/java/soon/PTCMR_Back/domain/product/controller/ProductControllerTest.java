@@ -9,19 +9,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
+import static soon.PTCMR_Back.domain.product.entity.ProductTest.pagingSetUp;
+import static soon.PTCMR_Back.domain.product.repository.ProductPaginationRepository.PAGE_SIZE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
-import org.assertj.core.api.Assertions;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
+import soon.PTCMR_Back.domain.product.dto.request.ProductPaginationRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
 import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.product.repository.ProductJpaRepository;
@@ -123,6 +125,33 @@ class ProductControllerTest {
             .andExpect(jsonPath("$.storageType").value(product.getStorageType().toString()))
             .andExpect(jsonPath("$.repurchase").value(product.isRepurchase()))
             .andExpect(jsonPath("$.description").value(product.getDescription()))
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("[GET] /product 요청 시 상품 페이징 조회")
+    void getPaginatedProducts() throws Exception {
+        // given
+        List<Product> pagingSetUp = pagingSetUp();
+        productJpaRepository.saveAll(pagingSetUp);
+
+        Long lastProductId = null;
+        String sortOption = "CREATE_DATE_DESC";
+        String category = null;
+
+        ProductPaginationRequest request = new ProductPaginationRequest(
+            lastProductId, sortOption, category);
+
+        String json = objectMapper.writeValueAsString(request);
+
+        // expected
+        mockMvc.perform(get("/api/v1/product")
+                .contentType(APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.products").isArray())
+            .andExpect(jsonPath("$.products.length()").value(PAGE_SIZE))
+            .andExpect(jsonPath("$.hasNext").value(true))
             .andDo(print());
     }
 }

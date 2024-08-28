@@ -1,22 +1,33 @@
 package soon.PTCMR_Back.domain.product.service;
 
+import static soon.PTCMR_Back.domain.product.entity.ProductSortOption.toSortOption;
+import static soon.PTCMR_Back.domain.product.repository.ProductPaginationRepository.PAGE_SIZE;
+
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import soon.PTCMR_Back.domain.product.dto.ProductPaginationDto;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
+import soon.PTCMR_Back.domain.product.dto.request.ProductPaginationRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
 import soon.PTCMR_Back.domain.product.dto.response.ProductDetailResponse;
+import soon.PTCMR_Back.domain.product.dto.response.ProductPaginationResponseWrapper;
 import soon.PTCMR_Back.domain.product.entity.Product;
+import soon.PTCMR_Back.domain.product.repository.ProductPaginationRepository;
 import soon.PTCMR_Back.domain.product.repository.ProductRepository;
 import soon.PTCMR_Back.domain.team.repository.TeamRepository;
 import soon.PTCMR_Back.global.exception.TeamNotFoundException;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final TeamRepository teamRepository;
+    private final ProductPaginationRepository productPaginationRepository;
 
     @Transactional
     public Long create(ProductCreateRequest request) {
@@ -51,5 +62,27 @@ public class ProductService {
         Product product = productRepository.findById(productId);
 
         return ProductDetailResponse.from(product);
+    }
+
+    @Transactional(readOnly = true)
+    public ProductPaginationResponseWrapper getPaginatedProducts(ProductPaginationRequest request) {
+        List<ProductPaginationDto> paginatedProducts = productPaginationRepository.getProductList(
+            request.lastProductId(), toSortOption(request.sortOption()), request.keyword());
+
+        boolean hasNext = determineHasNextPage(paginatedProducts);
+
+        return ProductPaginationResponseWrapper.builder()
+            .products(paginatedProducts)
+            .hasNext(hasNext)
+            .build();
+    }
+
+    private boolean determineHasNextPage(List<ProductPaginationDto> paginatedProducts) {
+        if (paginatedProducts.size() > PAGE_SIZE) {
+            paginatedProducts.remove(PAGE_SIZE);
+            return true;
+        }
+
+        return false;
     }
 }
