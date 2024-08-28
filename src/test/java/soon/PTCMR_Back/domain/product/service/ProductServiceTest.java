@@ -3,6 +3,7 @@ package soon.PTCMR_Back.domain.product.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
+import static soon.PTCMR_Back.domain.product.entity.ProductTest.pagingSetUp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,7 +26,7 @@ import soon.PTCMR_Back.domain.product.repository.ProductPaginationRepository;
 
 
 @SpringBootTest
-class ProductServiceTest {
+public class ProductServiceTest {
 
     @Autowired
     ProductJpaRepository productJpaRepository;
@@ -120,7 +121,8 @@ class ProductServiceTest {
     @DisplayName("상품 페이징 - 첫 페이지")
     void productPaginationFirstPage() {
         // given
-        pagingSetUp();
+        List<Product> pagingSetUp = pagingSetUp();
+        productJpaRepository.saveAll(pagingSetUp);
 
         Long lastProductId = null;
         String sortOption = "CREATE_DATE_DESC";
@@ -145,7 +147,8 @@ class ProductServiceTest {
     @DisplayName("상품 페이징 - 마지막 페이지")
     void productPaginationLastPage() {
         // given
-        pagingSetUp();
+        List<Product> pagingSetUp = pagingSetUp();
+        productJpaRepository.saveAll(pagingSetUp);
 
         Long lastProductId = 10L;
         String sortOption = "CREATE_DATE_DESC";
@@ -164,16 +167,5 @@ class ProductServiceTest {
         assertThat(paginatedProducts).isNotNull();
         assertThat(hasNext).isFalse();
         assertThat(products.size()).isEqualTo(ProductPaginationRepository.PAGE_SIZE);
-    }
-
-    private void pagingSetUp() {
-        for (int i = 0; i < 100; i++) {
-            ProductCreateRequest request = new ProductCreateRequest("자일리톨" + i,
-                LocalDateTime.now().plusDays(19), 2, "", StorageType.ROOM_TEMPERATURE.toString(),
-                true, "이것은 자일리톨 껌이요", 1L);
-
-            Product product = Product.create(request);
-            productJpaRepository.save(product);
-        }
     }
 }
