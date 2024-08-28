@@ -155,7 +155,8 @@ class ProductServiceTest {
             category);
 
         // when
-        ProductPaginationResponseWrapper paginatedProducts = productService.getPaginatedProducts(request);
+        ProductPaginationResponseWrapper paginatedProducts = productService.getPaginatedProducts(
+            request);
         List<ProductPaginationDto> products = paginatedProducts.products();
         boolean hasNext = paginatedProducts.hasNext();
 

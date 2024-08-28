@@ -21,6 +21,7 @@ import soon.PTCMR_Back.domain.product.dto.request.ProductPaginationRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
 import soon.PTCMR_Back.domain.product.dto.response.ProductDetailResponse;
 import soon.PTCMR_Back.domain.product.dto.ProductPaginationDto;
+import soon.PTCMR_Back.domain.product.dto.response.ProductPaginationResponseWrapper;
 import soon.PTCMR_Back.domain.product.service.ProductService;
 
 @RequiredArgsConstructor
@@ -64,8 +65,10 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductPaginationDto>> list(
+    public ResponseEntity<ProductPaginationResponseWrapper> getPaginatedProducts(
         @RequestBody ProductPaginationRequest request) {
-        return null;
+        ProductPaginationResponseWrapper paginatedProducts = productService.getPaginatedProducts(request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(paginatedProducts);
     }
 }
