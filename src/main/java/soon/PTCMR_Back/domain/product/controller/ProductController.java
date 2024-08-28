@@ -2,6 +2,7 @@ package soon.PTCMR_Back.domain.product.controller;
 
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -16,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
+import soon.PTCMR_Back.domain.product.dto.request.ProductPaginationRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
 import soon.PTCMR_Back.domain.product.dto.response.ProductDetailResponse;
+import soon.PTCMR_Back.domain.product.dto.ProductPaginationDto;
 import soon.PTCMR_Back.domain.product.service.ProductService;
 
 @RequiredArgsConstructor
@@ -58,5 +61,11 @@ public class ProductController {
         ProductDetailResponse detail = productService.detail(productId);
 
         return ResponseEntity.status(HttpStatus.OK).body(detail);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProductPaginationDto>> list(
+        @RequestBody ProductPaginationRequest request) {
+        return null;
     }
 }
