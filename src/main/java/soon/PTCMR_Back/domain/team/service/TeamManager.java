@@ -21,13 +21,13 @@ public class TeamManager {
 		return result;
 	}
 
-	public void verifyMemberInTeam(Team team, Member member) {
+	public void validateTeamAccess(Team team, Member member) {
 		if(!teamMemberRepository.existByTeamAndMember(team, member)){
 			throw new InvalidMemberException();
 		}
 	}
 
-	public void validateMemberInTeam(Team team, Member member) {
+	public void verifyMemberInTeam(Team team, Member member) {
 		if(teamMemberRepository.existByTeamAndMember(team, member)){
 			throw new TeamMemberExistException();
 		}
