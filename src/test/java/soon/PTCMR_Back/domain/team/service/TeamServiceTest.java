@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
-import soon.PTCMR_Back.domain.member.entity.Member;
 import soon.PTCMR_Back.domain.member.entity.SocialType;
 import soon.PTCMR_Back.domain.member.repository.MemberRepository;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamCreateRequest;
@@ -29,195 +28,192 @@ import soon.PTCMR_Back.global.util.invite.InviteGenerator;
 @SpringBootTest
 @DisplayName("TeamService 클래스")
 @Transactional
+@Rollback(value = false)
 class TeamServiceTest {
 
-    @Autowired
-    private TeamService teamService;
-    @Autowired
-    private TeamJpaRepository teamRepository;
-    @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
-    private InviteGenerator inviteGenerator;
+	@Autowired
+	private TeamService teamService;
+	@Autowired
+	private TeamJpaRepository teamRepository;
+	@Autowired
+	private MemberRepository memberRepository;
+	@Autowired
+	private InviteGenerator inviteGenerator;
 
-    @Nested
-    @DisplayName("create 메서드는")
-    class Describe_create {
+	UserDTO user
+		;
+	@BeforeEach
+	 void setUp() {
+		user = UserDTO.builder()
+			.name("test")
+			.provider(SocialType.KAKAO)
+			.uuid("KAKAO 1234")
+			.build();
 
-        UserDTO user = UserDTO.builder()
-            .name("test")
-            .provider(SocialType.KAKAO)
-            .uuid("KAKAO 12345678")
-            .build();
+	}
 
+	@Nested
+	@DisplayName("create 메서드는")
+	class Describe_create {
 
-        @BeforeEach
-        @Rollback(value = false)
-        void setUp() {
-            memberRepository.save(
-                Member.create(user.uuid(), user.name(), "default", SocialType.KAKAO));
-        }
+		@AfterEach
+		void tearDown() {
+			memberRepository.deleteAll();
+		}
 
-        @AfterEach
-        void tearDown() {
-            memberRepository.deleteAll();
-        }
+		@Nested
+		@DisplayName("만약 성공한다면")
+		class Create_success {
 
-        @Nested
-        @DisplayName("만약 성공한다면")
-        class Create_success {
+			@Test
+			@DisplayName("팀의 아이디를 반환한다.")
+			void success() {
+				TeamCreateRequest teamCreateRequest = new TeamCreateRequest("test");
 
-            @Test
-            @DisplayName("팀의 아이디를 반환한다.")
-            void success() {
-                TeamCreateRequest teamCreateRequest = new TeamCreateRequest("test");
+				Long id = teamService.create(user.uuid(), teamCreateRequest.title());
 
-                Long id = teamService.create(user.uuid(), teamCreateRequest.title());
+				Team result = teamRepository.findById(id).orElseThrow();
 
-                Team result = teamRepository.findById(id).orElseThrow();
-
-                assertThat(result).isNotNull();
-                assertThat(result.getId()).isEqualTo(id);
-                assertThat(result.getInviteCode()).isNotNull();
-                assertThat(result.getTitle()).isEqualTo(teamCreateRequest.title());
-                assertThat(result.getCreateTime()).isNotNull();
-                assertThat(result.getSchedule().getDay()).isEqualTo(7);
-                assertThat(result.getSchedule().getHour()).isEqualTo(12);
-            }
-        }
-    }
+				assertThat(result).isNotNull();
+				assertThat(result.getId()).isEqualTo(id);
+				assertThat(result.getInviteCode()).isNotNull();
+				assertThat(result.getTitle()).isEqualTo(teamCreateRequest.title());
+				assertThat(result.getCreateTime()).isNotNull();
+				assertThat(result.getSchedule().getDay()).isEqualTo(7);
+				assertThat(result.getSchedule().getHour()).isEqualTo(12);
+			}
+		}
+	}
 
 
-    @Nested
-    @DisplayName("update 메서드는")
-    class Describe_update {
+	@Nested
+	@DisplayName("update 메서드는")
+	class Describe_update {
 
-        @Nested
-        @DisplayName("올바른 요청을 받았을 때")
-        class Update_success {
+		@Nested
+		@DisplayName("올바른 요청을 받았을 때")
+		class Update_success {
 
-            @BeforeEach
-            void setUp() {
-                teamRepository.save(Team.create("test", inviteGenerator.createInviteCode()));
-            }
+			@BeforeEach
+			void setUp() {
+				teamRepository.save(Team.create("test", inviteGenerator.createInviteCode()));
+			}
 
-            @Test
-            @DisplayName("TeamDetail 반환한다")
-            void success() {
+			@Test
+			@DisplayName("TeamDetail 반환한다")
+			void success() {
 
-                TeamUpdateRequest teamUpdateRequest = new TeamUpdateRequest(
-                    5L,
-                    "newTestTitle",
-                    10L,
-                    12
-                );
+				TeamUpdateRequest teamUpdateRequest = new TeamUpdateRequest(
+					5L,
+					"newTestTitle",
+					10L,
+					12
+				);
 
-                String uuid = "kakao 1234";
+				String uuid = "kakao 1234";
 
-                TeamDetails result = teamService.update(
-                    teamUpdateRequest.teamId(),
-                    teamUpdateRequest.newTitle(),
-                    teamUpdateRequest.notificationDay(),
-                    teamUpdateRequest.notificationHour(),
-                    uuid);
+				TeamDetails result = teamService.update(
+					teamUpdateRequest.teamId(),
+					teamUpdateRequest.newTitle(),
+					teamUpdateRequest.notificationDay(),
+					teamUpdateRequest.notificationHour(),
+					uuid);
 
-                assertThat(result.teamId()).isEqualTo(teamUpdateRequest.teamId());
-                assertThat(result.title()).isEqualTo(teamUpdateRequest.newTitle());
-                assertThat(result.notificationDay()).isEqualTo(teamUpdateRequest.notificationDay());
-                assertThat(result.notificationHour()).isEqualTo(
-                    teamUpdateRequest.notificationHour());
+				assertThat(result.teamId()).isEqualTo(teamUpdateRequest.teamId());
+				assertThat(result.title()).isEqualTo(teamUpdateRequest.newTitle());
+				assertThat(result.notificationDay()).isEqualTo(teamUpdateRequest.notificationDay());
+				assertThat(result.notificationHour()).isEqualTo(
+					teamUpdateRequest.notificationHour());
 
-            }
-        }
+			}
+		}
 
-        @Nested
-        @DisplayName("찾는 팀이 존재하지 않을 때")
-        class Update_InvalidId_Expect_TeamNotFoundException {
+		@Nested
+		@DisplayName("찾는 팀이 존재하지 않을 때")
+		class Update_InvalidId_Expect_TeamNotFoundException {
 
-            @Test
-            @DisplayName("TeamNotFoundException 발생시킨다")
-            void fail() {
-                assertThatThrownBy(
-                    () -> teamService.update(999L, "test", 1L, 1L, "test")
-                ).isInstanceOf(TeamNotFoundException.class);
-            }
-        }
-    }
-
-
-    @Nested
-    @DisplayName("delete 메서드는")
-    class Describe_delete {
-
-        @Nested
-        @DisplayName("올바른 요청을 받았을 때")
-        class Delete_success {
-
-            @Test
-            @DisplayName("deleted를 true로 바꾼다.")
-            void success() {
-
-                Long teamId = 2L;
-                String uuid = "kakao 1234";
-
-                teamService.delete(
-                    teamId,
-                    uuid
-                );
-
-                assertThat(teamRepository.findById(teamId)).isEmpty();
-            }
-        }
+			@Test
+			@DisplayName("TeamNotFoundException 발생시킨다")
+			void fail() {
+				assertThatThrownBy(
+					() -> teamService.update(999L, "test", 1L, 1L, "test")
+				).isInstanceOf(TeamNotFoundException.class);
+			}
+		}
+	}
 
 
-        @Nested
-        @DisplayName("팀에 속하지 않은 멤버가 요청했을 때")
-        class Delete_InvalidMember_Expect_InvalidMemberException {
+	@Nested
+	@DisplayName("delete 메서드는")
+	class Describe_delete {
 
-            @Test
-            @DisplayName("InvalidMemberException 발생시킨다.")
-            void fail() {
-                assertThatThrownBy(
-                    () -> teamService.delete(2L, "kakao 12345")
-                ).isInstanceOf(InvalidMemberException.class);
-            }
-        }
+		@Nested
+		@DisplayName("올바른 요청을 받았을 때")
+		class Delete_success {
 
+			@Test
+			@DisplayName("deleted를 true로 바꾼다.")
+			void success() {
 
-        @Nested
-        @DisplayName("삭제하려는 팀이 존재하지 않을 때")
-        class Delete_InvalidTeam_Expect_TeamNotFoundException {
+				Long teamId = 2L;
+				String uuid = "kakao 1234";
 
-            @Test
-            @DisplayName("TeamNotFoundException 발생시킨다.")
-            void fail() {
-                assertThatThrownBy(
-                    () -> teamService.delete(999L, "kakao 12345")
-                ).isInstanceOf(TeamNotFoundException.class);
-            }
-        }
-    }
+				teamService.delete(
+					teamId,
+					uuid
+				);
+
+				assertThat(teamRepository.findById(teamId)).isEmpty();
+			}
+		}
 
 
-    @Nested
-    @DisplayName("Invite 메서드는")
-    class Describe_invite {
+		@Nested
+		@DisplayName("팀에 속하지 않은 멤버가 요청했을 때")
+		class Delete_InvalidMember_Expect_InvalidMemberException {
 
-        @Nested
-        @DisplayName("유효한 초대코드 일 때")
-        class Invite_ValidInviteCode_Expect_Success {
-
-            @Test
-            void success() {
-                String uuid = "kakao 1234";
-                String inviteCode = inviteGenerator.createInviteCode();
-
-                assertThatCode(() -> teamService.invite(uuid, inviteCode)).doesNotThrowAnyException();
-
-            }
+			@Test
+			@DisplayName("InvalidMemberException 발생시킨다.")
+			void fail() {
+				assertThatThrownBy(
+					() -> teamService.delete(2L, "kakao 12345")
+				).isInstanceOf(InvalidMemberException.class);
+			}
+		}
 
 
-        }
-    }
+		@Nested
+		@DisplayName("삭제하려는 팀이 존재하지 않을 때")
+		class Delete_InvalidTeam_Expect_TeamNotFoundException {
+
+			@Test
+			@DisplayName("TeamNotFoundException 발생시킨다.")
+			void fail() {
+				assertThatThrownBy(
+					() -> teamService.delete(999L, "kakao 12345")
+				).isInstanceOf(TeamNotFoundException.class);
+			}
+		}
+	}
+
+
+	@Nested
+	@DisplayName("Invite 메서드는")
+	class Describe_invite {
+
+		@Nested
+		@DisplayName("유효한 초대코드 일 때")
+		class Invite_ValidInviteCode_Expect_Success {
+
+			@Test
+			void success() {
+				String inviteCode = "2kTthZEy";
+
+				assertThatCode(
+					() -> teamService.invite(user.uuid(), inviteCode)).doesNotThrowAnyException();
+
+			}
+		}
+	}
 
 }

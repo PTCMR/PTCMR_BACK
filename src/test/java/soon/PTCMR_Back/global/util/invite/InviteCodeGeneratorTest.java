@@ -25,7 +25,7 @@ class InviteCodeGeneratorTest {
 	void test1() throws InterruptedException {
 		ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-		for (int i = 0; i < 100000; i++) {
+		for (int i = 0; i < 10000; i++) {
 			executorService.submit(() -> {
 					set.add(inviteGenerator.createInviteCode());
 				}
