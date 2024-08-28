@@ -28,15 +28,19 @@ public class Team extends BaseTimeEntity {
     @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false, unique = true)
+    private String inviteCode;
+
     @Embedded
     private NotificationSchedule schedule;
 
     @Column(columnDefinition = "tinyint(1) default 0")
     private boolean deleted;
 
-    public static Team create(String title) {
+    public static Team create(String title, String inviteCode) {
         return Team.builder()
             .title(title)
+            .inviteCode(inviteCode)
             .schedule(NotificationSchedule.create())
             .build();
     }
@@ -47,8 +51,9 @@ public class Team extends BaseTimeEntity {
     }
 
     @Builder
-    private Team(String title, NotificationSchedule schedule) {
+    private Team(String title, String inviteCode, NotificationSchedule schedule) {
         this.title = title;
+        this.inviteCode = inviteCode;
         this.schedule = schedule;
     }
 

@@ -7,6 +7,7 @@ import soon.PTCMR_Back.domain.team.entity.Team;
 import soon.PTCMR_Back.domain.team.entity.TeamMember;
 import soon.PTCMR_Back.domain.team.repository.TeamMemberRepository;
 import soon.PTCMR_Back.global.exception.InvalidMemberException;
+import soon.PTCMR_Back.global.exception.TeamMemberExistException;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,12 @@ public class TeamManager {
 	public void verifyMemberInTeam(Team team, Member member) {
 		if(!teamMemberRepository.existByTeamAndMember(team, member)){
 			throw new InvalidMemberException();
+		}
+	}
+
+	public void validateMemberInTeam(Team team, Member member) {
+		if(teamMemberRepository.existByTeamAndMember(team, member)){
+			throw new TeamMemberExistException();
 		}
 	}
 }
