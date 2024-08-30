@@ -46,6 +46,7 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'com.h2database:h2'
 
     // queryDSL
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/PTCMR_back.main.iml" filepath="$PROJECT_DIR$/.idea/modules/PTCMR_back.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/PTCMR_back.test.iml" filepath="$PROJECT_DIR$/.idea/modules/PTCMR_back.test.iml" />
     </modules>
   </component>
 </project>
