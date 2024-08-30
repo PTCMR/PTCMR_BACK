@@ -8,7 +8,7 @@ import soon.PTCMR_Back.domain.member.repository.MemberRepository;
 import soon.PTCMR_Back.domain.team.dto.response.TeamDetails;
 import soon.PTCMR_Back.domain.team.entity.Team;
 import soon.PTCMR_Back.domain.team.repository.TeamRepository;
-import soon.PTCMR_Back.global.exception.MemberNotFoundException;
+import soon.PTCMR_Back.global.util.invite.InviteGenerator;
 
 @Service
 @RequiredArgsConstructor
@@ -18,11 +18,12 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final MemberRepository memberRepository;
     private final TeamManager teamManager;
+    private final InviteGenerator inviteGenerator;
 
     @Transactional
     public Long create(String uuid, String title) {
         Member member = memberRepository.findByUuid(uuid);
-        Team team = Team.create(title);
+        Team team = Team.create(title, inviteGenerator.createInviteCode());
 
         Long result = teamRepository.save(team);
 

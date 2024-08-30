@@ -7,9 +7,9 @@ public record TeamUpdateRequest(
 	Long teamId,
 	@NotBlank(message = "팀 이름은 필수입니다.")
 	String newTitle,
-	@NotBlank(message = "")
+	@NotBlank(message = "알림일은 필수입니다.")
 	long notificationDay,
-	@NotBlank(message = "")
+	@NotBlank(message = "알림시간은 필수입니다.")
 	long notificationHour
 ) {
 
