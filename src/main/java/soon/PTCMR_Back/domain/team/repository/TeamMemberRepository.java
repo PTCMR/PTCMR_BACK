@@ -19,4 +19,8 @@ public class TeamMemberRepository {
 	public boolean existByTeamAndMember(Team team, Member member) {
 		return teamMemberJpaRepository.existsByTeamAndMember(team, member);
 	}
+
+	public void deleteAll() {
+		teamMemberJpaRepository.deleteAll();
+	}
 }

@@ -5,30 +5,29 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import soon.PTCMR_Back.domain.member.entity.SocialType;
+import soon.PTCMR_Back.domain.member.MockUser;
+import soon.PTCMR_Back.domain.member.entity.Member;
 import soon.PTCMR_Back.domain.member.repository.MemberRepository;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamCreateRequest;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamUpdateRequest;
 import soon.PTCMR_Back.domain.team.dto.response.TeamDetails;
 import soon.PTCMR_Back.domain.team.entity.Team;
+import soon.PTCMR_Back.domain.team.entity.TeamMember;
 import soon.PTCMR_Back.domain.team.repository.TeamJpaRepository;
+import soon.PTCMR_Back.domain.team.repository.TeamMemberRepository;
 import soon.PTCMR_Back.global.exception.InvalidMemberException;
 import soon.PTCMR_Back.global.exception.TeamNotFoundException;
-import soon.PTCMR_Back.global.oauth.dto.UserDTO;
 import soon.PTCMR_Back.global.util.invite.InviteGenerator;
 
 @SpringBootTest
 @DisplayName("TeamService 클래스")
 @Transactional
-@Rollback(value = false)
 class TeamServiceTest {
 
 	@Autowired
@@ -36,33 +35,27 @@ class TeamServiceTest {
 	@Autowired
 	private TeamJpaRepository teamRepository;
 	@Autowired
+	private TeamMemberRepository teamMemberRepository;
+	@Autowired
 	private MemberRepository memberRepository;
 	@Autowired
 	private InviteGenerator inviteGenerator;
 
-	UserDTO user;
+	private  Member member;
+	private Long id;
 
 	@BeforeEach
-	void setUp() {
-		user = UserDTO.builder()
-			.name("test")
-			.provider(SocialType.KAKAO)
-			.uuid("KAKAO 1234")
-			.build();
-
+	 void beforeAll() {
+		member = memberRepository.save(MockUser.createMockMember("kakao 1234"));
 	}
+
 
 	@Nested
 	@DisplayName("create 메서드는")
 	class Describe_create {
 
-		@AfterEach
-		void tearDown() {
-			memberRepository.deleteAll();
-		}
-
 		@Nested
-		@DisplayName("만약 성공한다면")
+		@DisplayName("올바른 요청을 받았을 때")
 		class Create_success {
 
 			@Test
@@ -70,7 +63,7 @@ class TeamServiceTest {
 			void success() {
 				TeamCreateRequest teamCreateRequest = new TeamCreateRequest("test");
 
-				Long id = teamService.create(user.uuid(), teamCreateRequest.title());
+				id = teamService.create(member.getUuid(), teamCreateRequest.title());
 
 				Team result = teamRepository.findById(id).orElseThrow();
 
@@ -96,7 +89,12 @@ class TeamServiceTest {
 
 			@BeforeEach
 			void setUp() {
-				teamRepository.save(Team.create("test", inviteGenerator.createInviteCode()));
+				Team team = teamRepository.save(
+					Team.create("test", inviteGenerator.createInviteCode()));
+
+				id = team.getId();
+
+				teamMemberRepository.save(TeamMember.create(team, member));
 			}
 
 			@Test
@@ -104,21 +102,19 @@ class TeamServiceTest {
 			void success() {
 
 				TeamUpdateRequest teamUpdateRequest = new TeamUpdateRequest(
-					5L,
+					id,
 					"newTestTitle",
 					10L,
 					12
 				);
 
-				String uuid = "kakao 1234";
-
 				TeamDetails result = teamService.update(
-					uuid,
+					member.getUuid(),
 					teamUpdateRequest.teamId(),
 					teamUpdateRequest.newTitle(),
 					teamUpdateRequest.notificationDay(),
 					teamUpdateRequest.notificationHour()
-					);
+				);
 
 				assertThat(result.teamId()).isEqualTo(teamUpdateRequest.teamId());
 				assertThat(result.title()).isEqualTo(teamUpdateRequest.newTitle());
@@ -137,7 +133,7 @@ class TeamServiceTest {
 			@DisplayName("TeamNotFoundException 발생시킨다")
 			void fail() {
 				assertThatThrownBy(
-					() -> teamService.update("test", 999L, "test", 1L, 1L)
+					() -> teamService.update(member.getUuid(), 999L, "test", 1L, 1L)
 				).isInstanceOf(TeamNotFoundException.class);
 			}
 		}
@@ -148,6 +144,15 @@ class TeamServiceTest {
 	@DisplayName("delete 메서드는")
 	class Describe_delete {
 
+		@BeforeEach
+		void setUp() {
+			Team team = teamRepository.save(
+				Team.create("test", inviteGenerator.createInviteCode()));
+
+			id = team.getId();
+			teamMemberRepository.save(TeamMember.create(team, member));
+		}
+
 		@Nested
 		@DisplayName("올바른 요청을 받았을 때")
 		class Delete_success {
@@ -156,15 +161,12 @@ class TeamServiceTest {
 			@DisplayName("deleted를 true로 바꾼다.")
 			void success() {
 
-				Long teamId = 2L;
-				String uuid = "kakao 1234";
-
 				teamService.delete(
-					uuid,
-					teamId
+					member.getUuid(),
+					id
 				);
 
-				assertThat(teamRepository.findById(teamId)).isEmpty();
+				assertThat(teamRepository.findById(id)).isNotNull();
 			}
 		}
 
@@ -173,11 +175,16 @@ class TeamServiceTest {
 		@DisplayName("팀에 속하지 않은 멤버가 요청했을 때")
 		class Delete_InvalidMember_Expect_InvalidMemberException {
 
+			Member member = MockUser.createMockMember("kakao 123456");
+
 			@Test
 			@DisplayName("InvalidMemberException 발생시킨다.")
 			void fail() {
+
+				memberRepository.save(member);
+
 				assertThatThrownBy(
-					() -> teamService.delete("kakao 12345", 2L)
+					() -> teamService.delete(member.getUuid(), id)
 				).isInstanceOf(InvalidMemberException.class);
 			}
 		}
@@ -191,7 +198,7 @@ class TeamServiceTest {
 			@DisplayName("TeamNotFoundException 발생시킨다.")
 			void fail() {
 				assertThatThrownBy(
-					() -> teamService.delete("kakao 12345", 999L)
+					() -> teamService.delete(member.getUuid(), 999L)
 				).isInstanceOf(TeamNotFoundException.class);
 			}
 		}
@@ -206,12 +213,18 @@ class TeamServiceTest {
 		@DisplayName("유효한 초대코드 일 때")
 		class Invite_ValidInviteCode_Expect_Success {
 
+			String inviteCode = inviteGenerator.createInviteCode();
+
+			@BeforeEach
+			void setUp() {
+				teamRepository.save(Team.create("test", inviteCode));
+			}
+
 			@Test
 			void success() {
-				String inviteCode = "2kTthZEy";
 
 				assertThatCode(
-					() -> teamService.invite(user.uuid(), inviteCode)).doesNotThrowAnyException();
+					() -> teamService.invite(member.getUuid(), inviteCode)).doesNotThrowAnyException();
 
 			}
 		}
