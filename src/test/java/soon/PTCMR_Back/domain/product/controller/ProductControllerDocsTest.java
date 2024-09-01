@@ -13,9 +13,13 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
+import static soon.PTCMR_Back.domain.product.entity.ProductTest.pagingSetUp;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
+import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
+import soon.PTCMR_Back.domain.product.dto.request.ProductPaginationRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
 import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.product.repository.ProductJpaRepository;
@@ -60,7 +65,8 @@ public class ProductControllerDocsTest {
         teamJpaRepository.deleteAll();
 
         InviteCodeGenerator inviteCodeGenerator = new InviteCodeGenerator();
-        teamId = teamJpaRepository.save(Team.create("title", inviteCodeGenerator.createInviteCode())).getId();
+        teamId = teamJpaRepository.save(
+            Team.create("title", inviteCodeGenerator.createInviteCode())).getId();
     }
 
     @Test
@@ -150,6 +156,7 @@ public class ProductControllerDocsTest {
     }
 
     @Test
+    @DisplayName("단일 상품 조회")
     void detail() throws Exception {
         // given
         Product product = createProduct(teamId);
@@ -163,5 +170,38 @@ public class ProductControllerDocsTest {
             .andDo(document("product-detail",
                 pathParameters(parameterWithName("productId").description("상품 ID"))
             ));
+    }
+
+    @Test
+    @DisplayName("상품 페이징")
+    void pagination() throws Exception {
+        // given
+        List<Product> pagingSetUp = pagingSetUp(teamId);
+        productJpaRepository.saveAll(pagingSetUp);
+
+        Long lastProductId = null;
+        String sortOption = "CREATE_DATE_DESC";
+        String category = "";
+
+        ProductPaginationRequest request = new ProductPaginationRequest(lastProductId, sortOption,
+            category);
+
+        String json = objectMapper.writeValueAsString(request);
+
+        // expected
+        mockMvc.perform(get("/api/v1/product")
+                .contentType(APPLICATION_JSON)
+                .content(json)
+            )
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document("product-pagination",
+                requestFields(
+                    fieldWithPath("lastProductId").description("마지막 상품 아이디"),
+                    fieldWithPath("sortOption").description("정렬 조건"),
+                    fieldWithPath("keyword").description("카테고리 [미구현]")
+                )
+            ));
+
     }
 }

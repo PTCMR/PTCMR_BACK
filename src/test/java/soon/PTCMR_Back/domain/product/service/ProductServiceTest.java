@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
 import static soon.PTCMR_Back.domain.product.entity.ProductTest.pagingSetUp;
+import static soon.PTCMR_Back.domain.product.repository.ProductPaginationRepository.PAGE_SIZE;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,10 +46,13 @@ public class ProductServiceTest {
     @BeforeEach
     void clean() {
         productJpaRepository.deleteAll();
+        teamJpaRepository.deleteAll();
 
         InviteCodeGenerator inviteCodeGenerator = new InviteCodeGenerator();
-        teamId = teamJpaRepository.save(Team.create("title", inviteCodeGenerator.createInviteCode())).getId();
+        teamId = teamJpaRepository.save(
+            Team.create("title", inviteCodeGenerator.createInviteCode())).getId();
     }
+
     @Test
     @DisplayName("상품 자체 등록")
     void productSelfCreate() {
@@ -150,7 +154,7 @@ public class ProductServiceTest {
         // then
         assertThat(paginatedProducts).isNotNull();
         assertThat(hasNext).isTrue();
-        assertThat(products.size()).isEqualTo(ProductPaginationRepository.PAGE_SIZE);
+        assertThat(products.size()).isEqualTo(PAGE_SIZE);
     }
 
     @Test
@@ -160,7 +164,7 @@ public class ProductServiceTest {
         List<Product> pagingSetUp = pagingSetUp(teamId);
         productJpaRepository.saveAll(pagingSetUp);
 
-        Long lastProductId = 10L;
+        Long lastProductId = pagingSetUp.get(PAGE_SIZE - 1).getId();
         String sortOption = "CREATE_DATE_DESC";
         String category = "";
 
