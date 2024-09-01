@@ -33,8 +33,11 @@ public class TeamService {
     }
 
     @Transactional
-    public TeamDetails update(Long teamId, String newTitle, long notificationDay, long notificationHour, String uuid) {
+    public TeamDetails update(String uuid, Long teamId, String newTitle, long notificationDay, long notificationHour) {
+        Member member = memberRepository.findByUuid(uuid);
         Team team = teamRepository.findById(teamId);
+
+        teamManager.validateTeamAccess(team, member);
         team.update(newTitle, notificationDay, notificationHour);
 
 
@@ -42,11 +45,11 @@ public class TeamService {
     }
 
     @Transactional
-	public void delete(Long teamId, String uuid) {
-        Team team = teamRepository.findById(teamId);
+	public void delete(String uuid, Long teamId) {
         Member member = memberRepository.findByUuid(uuid);
+        Team team = teamRepository.findById(teamId);
 
-        teamManager.verifyMemberInTeam(team, member);
+        teamManager.validateTeamAccess(team, member);
         teamRepository.delete(team);
 	}
 
@@ -55,7 +58,7 @@ public class TeamService {
         Member member = memberRepository.findByUuid(uuid);
         Team team = teamRepository.findByInviteCode(inviteCode);
 
-        teamManager.validateMemberInTeam(team, member);
+        teamManager.verifyMemberInTeam(team, member);
         teamManager.joinTeam(team, member);
     }
 }

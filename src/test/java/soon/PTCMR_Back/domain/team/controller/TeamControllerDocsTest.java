@@ -24,27 +24,55 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import soon.PTCMR_Back.domain.member.MockUser;
+import soon.PTCMR_Back.domain.member.entity.Member;
+import soon.PTCMR_Back.domain.member.repository.MemberRepository;
+import soon.PTCMR_Back.domain.team.data.TeamData;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamCreateRequest;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamInviteRequest;
 import soon.PTCMR_Back.domain.team.dto.reqeust.TeamUpdateRequest;
+import soon.PTCMR_Back.domain.team.entity.Team;
+import soon.PTCMR_Back.domain.team.entity.TeamMember;
+import soon.PTCMR_Back.domain.team.repository.TeamMemberRepository;
+import soon.PTCMR_Back.domain.team.repository.TeamRepository;
 
 @AutoConfigureRestDocs(uriScheme = "https", uriHost = "dns-name.com", uriPort = 443)
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(RestDocumentationExtension.class)
+@Transactional
 @SpringBootTest
 public class TeamControllerDocsTest {
 
 	@Autowired
-	private MockMvc mockMvc;
+	private MemberRepository memberRepository;
+
+	@Autowired
+	private TeamRepository teamRepository;
+
+	@Autowired
+	private TeamMemberRepository teamMemberRepository;
 
 	@Autowired
 	private ObjectMapper objectMapper;
 
+	@Autowired
+	private MockMvc mockMvc;
+
+	Member member;
+	Team team;
+
 	@BeforeEach
 	void setUp() {
 		MockUser.createMockUser();
+		member = MockUser.createMockMember("kakao 1234");
+		team = TeamData.createTeam();
+
+		teamRepository.save(team);
+		memberRepository.save(member);
+		teamMemberRepository.save(TeamMember.create(team, member));
 	}
+
 
 	@Test
 	@DisplayName("[POST] /api/v1/team 요청 시 팀 생성")
@@ -66,9 +94,9 @@ public class TeamControllerDocsTest {
 	}
 
 	@Test
-	@DisplayName("[POST] /api/v1/team 요청 시 팀 생성")
+	@DisplayName("[POST] /api/v1/team 요청 시 팀 업데이트")
 	void update() throws Exception {
-		TeamUpdateRequest teamUpdateRequest = new TeamUpdateRequest(2L, "TestUpdate", 5L, 12L);
+		TeamUpdateRequest teamUpdateRequest = new TeamUpdateRequest(team.getId(), "TestUpdate", 5L, 12L);
 		String json = objectMapper.writeValueAsString(teamUpdateRequest);
 
 		mockMvc.perform(put("/api/v1/team")
@@ -89,8 +117,8 @@ public class TeamControllerDocsTest {
 	@Test
 	@DisplayName("[DELETE] /api/v1/team/{teamId} 요청 시 팀 삭제")
 	void delete() throws Exception {
-		Long teamId = 2L;
-		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/v1/team/{teamId}", teamId))
+
+		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/v1/team/{teamId}", team.getId()))
 			.andExpect(status().isNoContent())
 			.andDo(print())
 			.andDo(document("team-delete",
@@ -104,7 +132,8 @@ public class TeamControllerDocsTest {
 	@DisplayName("[POST] /api/v1/team/invite 요청 시 팀 생성")
 	void invite() throws Exception {
 
-		String json = objectMapper.writeValueAsString(new TeamInviteRequest("XTLRqNyw"));
+		teamMemberRepository.deleteAll();
+		String json = objectMapper.writeValueAsString(new TeamInviteRequest(TeamData.INVITE_CODE));
 
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/team/invite")
 				.contentType(MediaType.APPLICATION_JSON)
