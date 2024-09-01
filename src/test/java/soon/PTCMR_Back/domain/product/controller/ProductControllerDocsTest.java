@@ -3,6 +3,7 @@ package soon.PTCMR_Back.domain.product.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -29,6 +30,9 @@ import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
 import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.product.repository.ProductJpaRepository;
+import soon.PTCMR_Back.domain.team.entity.Team;
+import soon.PTCMR_Back.domain.team.repository.TeamJpaRepository;
+import soon.PTCMR_Back.global.util.invite.InviteCodeGenerator;
 
 @AutoConfigureRestDocs(uriScheme = "https", uriHost = "dns-name.com", uriPort = 443)
 @AutoConfigureMockMvc(addFilters = false)
@@ -45,9 +49,18 @@ public class ProductControllerDocsTest {
     @Autowired
     private ProductJpaRepository productJpaRepository;
 
+    @Autowired
+    private TeamJpaRepository teamJpaRepository;
+
+    private Long teamId;
+
     @BeforeEach
     void clean() {
         productJpaRepository.deleteAll();
+        teamJpaRepository.deleteAll();
+
+        InviteCodeGenerator inviteCodeGenerator = new InviteCodeGenerator();
+        teamId = teamJpaRepository.save(Team.create("title", inviteCodeGenerator.createInviteCode())).getId();
     }
 
     @Test
@@ -87,7 +100,7 @@ public class ProductControllerDocsTest {
     @DisplayName("상품 삭제")
     void productDelete() throws Exception {
         // given
-        Product product = createProduct();
+        Product product = createProduct(teamId);
         productJpaRepository.saveAndFlush(product);
 
         // expected
@@ -103,7 +116,7 @@ public class ProductControllerDocsTest {
     @DisplayName("상품 수정")
     void update() throws Exception {
         // given
-        Product product = createProduct();
+        Product product = createProduct(teamId);
         productJpaRepository.saveAndFlush(product);
 
         String newName = "후라보노";
@@ -133,6 +146,22 @@ public class ProductControllerDocsTest {
                     fieldWithPath("repurchase").description("재구매 여부"),
                     fieldWithPath("description").description("상품 설명")
                 )
+            ));
+    }
+
+    @Test
+    void detail() throws Exception {
+        // given
+        Product product = createProduct(teamId);
+        productJpaRepository.save(product);
+
+        // expected
+        mockMvc.perform(get("/api/v1/product/{productId}", product.getId())
+                .contentType(APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document("product-detail",
+                pathParameters(parameterWithName("productId").description("상품 ID"))
             ));
     }
 }
