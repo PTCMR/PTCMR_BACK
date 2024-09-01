@@ -21,4 +21,8 @@ public class MemberRepository {
 	public void deleteAll() {
 		jpaRepository.deleteAll();
 	}
+
+	public boolean existByUuid(String uuid) {
+		return jpaRepository.existsByUuid(uuid);
+	}
 }
