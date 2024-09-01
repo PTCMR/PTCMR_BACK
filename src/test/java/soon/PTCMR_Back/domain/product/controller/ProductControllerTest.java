@@ -29,6 +29,7 @@ import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.product.repository.ProductJpaRepository;
 import soon.PTCMR_Back.domain.team.entity.Team;
 import soon.PTCMR_Back.domain.team.repository.TeamJpaRepository;
+import soon.PTCMR_Back.global.util.invite.InviteCodeGenerator;
 
 @AutoConfigureMockMvc(addFilters = false)
 @SpringBootTest
@@ -51,7 +52,11 @@ class ProductControllerTest {
     @BeforeEach
     void clean() {
         productJpaRepository.deleteAll();
-        teamId = teamJpaRepository.save(Team.create("title", "invite Code example")).getId();
+        teamJpaRepository.deleteAll();
+
+        InviteCodeGenerator inviteCodeGenerator = new InviteCodeGenerator();
+        teamId = teamJpaRepository.save(
+            Team.create("title", inviteCodeGenerator.createInviteCode())).getId();
     }
 
     @Test

@@ -25,6 +25,7 @@ import soon.PTCMR_Back.domain.product.repository.ProductJpaRepository;
 import soon.PTCMR_Back.domain.product.repository.ProductPaginationRepository;
 import soon.PTCMR_Back.domain.team.entity.Team;
 import soon.PTCMR_Back.domain.team.repository.TeamJpaRepository;
+import soon.PTCMR_Back.global.util.invite.InviteCodeGenerator;
 
 
 @SpringBootTest
@@ -44,7 +45,9 @@ public class ProductServiceTest {
     @BeforeEach
     void clean() {
         productJpaRepository.deleteAll();
-        teamId = teamJpaRepository.save(Team.create("title", "invite Code example")).getId();
+
+        InviteCodeGenerator inviteCodeGenerator = new InviteCodeGenerator();
+        teamId = teamJpaRepository.save(Team.create("title", inviteCodeGenerator.createInviteCode())).getId();
     }
     @Test
     @DisplayName("상품 자체 등록")

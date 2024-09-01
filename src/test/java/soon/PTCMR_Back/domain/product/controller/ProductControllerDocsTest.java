@@ -71,7 +71,7 @@ public class ProductControllerDocsTest {
 
         ProductCreateRequest request = new ProductCreateRequest("자일리톨", expirationDate,
             1, "", "FROZEN",
-            true, "이것은 자일리톨 껌이요", 1L);
+            true, "이것은 자일리톨 껌이요", teamId);
 
         String json = objectMapper.writeValueAsString(request);
 
