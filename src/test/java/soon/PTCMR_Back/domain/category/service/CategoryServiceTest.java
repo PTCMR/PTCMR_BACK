@@ -47,11 +47,11 @@ class CategoryServiceTest {
     @DisplayName("카테고리 등록")
     void create() {
         // given
-        Product product = createProduct();
-        productJpaRepository.save(product);
-
         Team team = TeamData.createTeam(codeGenerator.createInviteCode());
         teamJpaRepository.save(team);
+
+        Product product = createProduct(team.getId());
+        productJpaRepository.save(product);
 
         CategoryCreateRequest request = new CategoryCreateRequest("testTitle", team.getId(),
             product.getId());

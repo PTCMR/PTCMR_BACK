@@ -1,6 +1,6 @@
 package soon.PTCMR_Back.domain.category.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -15,15 +15,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryCreateRequest;
 import soon.PTCMR_Back.domain.category.repository.CategoryJpaRepository;
-import soon.PTCMR_Back.domain.category.repository.CategoryRepository;
 import soon.PTCMR_Back.domain.category.service.CategoryService;
 import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.product.repository.ProductJpaRepository;
@@ -68,11 +63,12 @@ class CategoryControllerTest {
     @DisplayName("[POST] api/v1/category 요청 시 카테고리 생성")
     void create() throws Exception {
         // given
-        Product product = createProduct();
-        productJpaRepository.save(product);
-
         Team team = TeamData.createTeam(codeGenerator.createInviteCode());
         teamJpaRepository.save(team);
+
+        Product product = createProduct(team.getId());
+        productJpaRepository.save(product);
+
 
         CategoryCreateRequest request = new CategoryCreateRequest("testTitle", team.getId(),
             product.getId());
