@@ -3,7 +3,9 @@ package soon.PTCMR_Back.domain.category.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryCreateRequest;
+import soon.PTCMR_Back.domain.category.entity.Category;
 import soon.PTCMR_Back.domain.category.repository.CategoryRepository;
 import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.product.repository.ProductRepository;
@@ -20,6 +22,7 @@ public class CategoryService {
     private final ProductRepository productRepository;
     private final TeamRepository teamRepository;
 
+    @Transactional
     public Long create(CategoryCreateRequest request) {
         boolean existedCategoryTitle = categoryRepository.existCategoryTitle(request.title());
 
@@ -29,7 +32,8 @@ public class CategoryService {
 
         Product product = productRepository.findById(request.productId());
         Team team = teamRepository.findById(request.teamId());
+        Category category = Category.create(request.title(), team, product);
 
-        return null;
+        return categoryRepository.save(category);
     }
 }
