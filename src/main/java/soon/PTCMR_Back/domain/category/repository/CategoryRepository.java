@@ -9,5 +9,7 @@ public class CategoryRepository {
 
     private final CategoryJpaRepository categoryJpaRepository;
 
-
+    public boolean existCategoryTitle(String categoryTitle) {
+        return categoryJpaRepository.existsByTitle(categoryTitle);
+    }
 }
