@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import soon.PTCMR_Back.domain.product.dto.ProductPaginationDto;
 import soon.PTCMR_Back.domain.product.entity.ProductSortOption;
+import soon.PTCMR_Back.domain.team.entity.Team;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,7 +25,7 @@ public class ProductPaginationRepository {
 
     // TODO 카테고리 추가 시 수정
     public List<ProductPaginationDto> getProductList(Long productId, ProductSortOption option,
-        String category) {
+        String category, Team team) {
         final BooleanExpression condition = getProductCondition(productId, option);
 
         return queryFactory
@@ -34,13 +35,17 @@ public class ProductPaginationRepository {
                 product.expirationDate,
                 product.quantity,
                 product.imageUrl,
-                Expressions.stringTemplate("function('str', {0})", product.status).as("status"),
+                Expressions.stringTemplate("function('str', {0})", product.status)
+                    .as("status"),
                 Expressions.stringTemplate("function('str', {0})", product.storageType)
                     .as("storageType"),
                 product.createTime.as("createdDate")
             ))
             .from(product)
-            .where(condition)
+            .where(
+                product.team.eq(team),
+                condition
+            )
             .orderBy(getOrderSpecifier(option))
             .limit(PAGE_SIZE + 1)
             .fetch();

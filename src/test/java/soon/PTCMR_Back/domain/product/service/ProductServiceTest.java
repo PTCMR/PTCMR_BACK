@@ -143,7 +143,7 @@ public class ProductServiceTest {
         String category = "";
 
         ProductPaginationRequest request = new ProductPaginationRequest(lastProductId, sortOption,
-            category);
+            category, teamId);
 
         // when
         ProductPaginationResponseWrapper paginatedProducts = productService.getPaginatedProducts(
@@ -169,7 +169,7 @@ public class ProductServiceTest {
         String category = "";
 
         ProductPaginationRequest request = new ProductPaginationRequest(lastProductId, sortOption,
-            category);
+            category, teamId);
 
         // when
         ProductPaginationResponseWrapper paginatedProducts = productService.getPaginatedProducts(
