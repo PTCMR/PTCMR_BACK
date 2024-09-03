@@ -1,5 +1,6 @@
 package soon.PTCMR_Back.domain.product.repository;
 
+import static soon.PTCMR_Back.domain.category.entity.QCategory.category;
 import static soon.PTCMR_Back.domain.product.entity.QProduct.product;
 
 import com.querydsl.core.types.OrderSpecifier;
@@ -25,7 +26,7 @@ public class ProductPaginationRepository {
 
     // TODO 카테고리 추가 시 수정
     public List<ProductPaginationDto> getProductList(Long productId, ProductSortOption option,
-        String category, Team team) {
+        String categoryTitle, Team team) {
         final BooleanExpression condition = getProductCondition(productId, option);
 
         return queryFactory
@@ -42,8 +43,11 @@ public class ProductPaginationRepository {
                 product.createTime.as("createdDate")
             ))
             .from(product)
+            .leftJoin(category)
+            .on(category.product.id.eq(product.id))
             .where(
                 product.team.eq(team),
+                category.title.eq(categoryTitle),
                 condition
             )
             .orderBy(getOrderSpecifier(option))
@@ -57,9 +61,15 @@ public class ProductPaginationRepository {
         }
 
         return switch (option) {
-            case EXPIRATION_DATE_ASC, NAME_ASC, CREATE_DATE_ASC -> product.id.goe(productId);
+            case EXPIRATION_DATE_ASC, NAME_ASC, CREATE_DATE_ASC, CATEGORY_ASC ->
+                product.id.goe(productId);
             default -> product.id.loe(productId);
         };
+    }
+
+    private BooleanExpression getCategoryCondition() {
+
+        return null;
     }
 
     private OrderSpecifier<?> getOrderSpecifier(ProductSortOption option) {
@@ -69,6 +79,8 @@ public class ProductPaginationRepository {
             case NAME_DESC -> product.name.desc();
             case CREATE_DATE_ASC -> product.createTime.asc();
             case CREATE_DATE_DESC -> product.createTime.desc();
+            case CATEGORY_ASC -> category.title.asc();
+            case CATEGORY_DESC -> category.title.desc();
             default -> product.expirationDate.desc();
         };
     }

@@ -70,13 +70,15 @@ public class ProductService {
         Team team = teamRepository.findById(request.teamId());
 
         List<ProductPaginationDto> paginatedProducts = productPaginationRepository.getProductList(
-            request.lastProductId(), toSortOption(request.sortOption()), request.keyword(), team);
+            request.lastProductId(), toSortOption(request.sortOption()), request.categoryTitle(),
+            team);
 
         boolean hasNext = determineHasNextPage(paginatedProducts);
 
         return ProductPaginationResponseWrapper.builder()
             .products(paginatedProducts)
             .hasNext(hasNext)
+            .categoryTitle(request.categoryTitle())
             .build();
     }
 
