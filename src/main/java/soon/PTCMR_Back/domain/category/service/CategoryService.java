@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryCreateRequest;
+import soon.PTCMR_Back.domain.category.dto.request.CategoryUpdateRequest;
 import soon.PTCMR_Back.domain.category.entity.Category;
 import soon.PTCMR_Back.domain.category.repository.CategoryRepository;
 import soon.PTCMR_Back.domain.product.entity.Product;
@@ -35,5 +36,19 @@ public class CategoryService {
         Category category = Category.create(request.title(), team, product);
 
         return categoryRepository.save(category);
+    }
+
+    @Transactional
+    public void update(CategoryUpdateRequest request, Long categoryId) {
+        boolean existedCategoryTitle = categoryRepository.existCategoryTitle(request.title());
+
+        if (existedCategoryTitle) {
+            throw new CategoryExistException();
+        }
+
+        Category category = categoryRepository.findById(categoryId);
+        Product product = productRepository.findById(request.productId());
+
+        category.update(request.title(), product);
     }
 }

@@ -50,4 +50,9 @@ public class Category {
             .product(product)
             .build();
     }
+
+    public void update(String title, Product product) {
+        this.title = title;
+        this.product = product;
+    }
 }
