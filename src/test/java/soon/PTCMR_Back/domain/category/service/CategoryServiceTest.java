@@ -88,7 +88,6 @@ class CategoryServiceTest {
 
         // then
         Category updatedCategory = categoryJpaRepository.findById(category.getId()).get();
-
         assertThat(updatedCategory.getTitle()).isEqualTo(request.title());
         assertThat(updatedCategory.getProduct().getId()).isEqualTo(request.productId());
     }

@@ -26,6 +26,11 @@ public class CategoryService {
     @Transactional
     public Long create(CategoryCreateRequest request) {
         validateCategoryTitle(request.title());
+        boolean existedCategoryTitle = categoryRepository.existCategoryTitle(request.title());
+
+        if (existedCategoryTitle) {
+            throw new CategoryExistException();
+        }
 
         Product product = productRepository.findById(request.productId());
         Team team = teamRepository.findById(request.teamId());

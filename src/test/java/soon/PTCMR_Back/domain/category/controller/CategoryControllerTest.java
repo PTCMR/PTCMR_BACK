@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,6 @@ import soon.PTCMR_Back.domain.category.dto.request.CategoryCreateRequest;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryUpdateRequest;
 import soon.PTCMR_Back.domain.category.entity.Category;
 import soon.PTCMR_Back.domain.category.repository.CategoryJpaRepository;
-import soon.PTCMR_Back.domain.category.service.CategoryService;
 import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.product.repository.ProductJpaRepository;
 import soon.PTCMR_Back.domain.team.data.TeamData;
