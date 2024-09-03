@@ -34,6 +34,7 @@ public record ProductCreateRequest(
     @NotEmpty(message = "설명을 입력하세요.")
     String description,
 
+    @Positive(message = "팀 아이디를 제대로 입력하세요.")
     Long teamId
 ) {
 
