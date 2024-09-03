@@ -36,7 +36,7 @@ public class CategoryController {
         categoryService.update(request, categoryId);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create("/api/v1/category/"));
+        headers.setLocation(URI.create("/api/v1/category"));
 
         return ResponseEntity.status(HttpStatus.FOUND)
             .headers(headers)
