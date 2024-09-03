@@ -2,6 +2,7 @@ package soon.PTCMR_Back.domain.category.controller;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -18,8 +19,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryCreateRequest;
+import soon.PTCMR_Back.domain.category.dto.request.CategoryUpdateRequest;
+import soon.PTCMR_Back.domain.category.entity.Category;
 import soon.PTCMR_Back.domain.category.repository.CategoryJpaRepository;
-import soon.PTCMR_Back.domain.category.service.CategoryService;
 import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.product.repository.ProductJpaRepository;
 import soon.PTCMR_Back.domain.team.data.TeamData;
@@ -36,9 +38,6 @@ class CategoryControllerTest {
 
     @Autowired
     ObjectMapper objectMapper;
-
-    @Autowired
-    CategoryService categoryService;
 
     @Autowired
     CategoryJpaRepository categoryJpaRepository;
@@ -69,7 +68,6 @@ class CategoryControllerTest {
         Product product = createProduct(team.getId());
         productJpaRepository.save(product);
 
-
         CategoryCreateRequest request = new CategoryCreateRequest("testTitle", team.getId(),
             product.getId());
 
@@ -85,5 +83,30 @@ class CategoryControllerTest {
 
         Long categoryId = Long.parseLong(result.getResponse().getContentAsString());
         assertTrue(categoryJpaRepository.findById(categoryId).isPresent());
+    }
+
+    @Test
+    @DisplayName("[PATCH] api/v1/category/{categoryId} 요청 시 카테고리 수정")
+    void update() throws Exception {
+        // given
+        Team team = TeamData.createTeam(codeGenerator.createInviteCode());
+        teamJpaRepository.save(team);
+
+        Product product = createProduct(team.getId());
+        productJpaRepository.save(product);
+
+        Category category = Category.create("testTitle", team, product);
+        categoryJpaRepository.save(category);
+
+        CategoryUpdateRequest request = new CategoryUpdateRequest("new Title", product.getId());
+        String json = objectMapper.writeValueAsString(request);
+
+        // expected
+        mockMvc.perform(patch("/api/v1/category/{categoryId}", category.getId())
+                .contentType(APPLICATION_JSON)
+                .content(json)
+            )
+            .andExpect(status().isFound())
+            .andDo(print());
     }
 }
