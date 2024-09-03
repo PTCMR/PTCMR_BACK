@@ -10,7 +10,9 @@ public record ProductPaginationRequest(
     @ValidEnum(message = "정확한 정렬 조건을 입력해주세요", verifyClass = ProductSortOption.class, ignoreCase = true)
     String sortOption,
 
-    String keyword
+    String keyword,
+
+    Long teamId
 ) {
 
 }

@@ -153,7 +153,7 @@ class ProductControllerTest {
         String category = null;
 
         ProductPaginationRequest request = new ProductPaginationRequest(
-            lastProductId, sortOption, category);
+            lastProductId, sortOption, category, teamId);
 
         String json = objectMapper.writeValueAsString(request);
 

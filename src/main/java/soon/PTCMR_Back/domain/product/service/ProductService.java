@@ -17,6 +17,7 @@ import soon.PTCMR_Back.domain.product.dto.response.ProductPaginationResponseWrap
 import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.product.repository.ProductPaginationRepository;
 import soon.PTCMR_Back.domain.product.repository.ProductRepository;
+import soon.PTCMR_Back.domain.team.entity.Team;
 import soon.PTCMR_Back.domain.team.repository.TeamRepository;
 import soon.PTCMR_Back.global.exception.TeamNotFoundException;
 
@@ -66,8 +67,10 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public ProductPaginationResponseWrapper getPaginatedProducts(ProductPaginationRequest request) {
+        Team team = teamRepository.findById(request.teamId());
+
         List<ProductPaginationDto> paginatedProducts = productPaginationRepository.getProductList(
-            request.lastProductId(), toSortOption(request.sortOption()), request.keyword());
+            request.lastProductId(), toSortOption(request.sortOption()), request.keyword(), team);
 
         boolean hasNext = determineHasNextPage(paginatedProducts);
 
