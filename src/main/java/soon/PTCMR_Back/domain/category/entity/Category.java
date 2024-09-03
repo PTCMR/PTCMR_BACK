@@ -12,7 +12,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import soon.PTCMR_Back.domain.category.dto.request.CategoryCreateRequest;
 import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.team.entity.Team;
 
@@ -49,5 +48,10 @@ public class Category {
             .team(team)
             .product(product)
             .build();
+    }
+
+    public void update(String title, Product product) {
+        this.title = title;
+        this.product = product;
     }
 }
