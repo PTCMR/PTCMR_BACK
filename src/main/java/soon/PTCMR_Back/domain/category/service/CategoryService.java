@@ -25,11 +25,7 @@ public class CategoryService {
 
     @Transactional
     public Long create(CategoryCreateRequest request) {
-        boolean existedCategoryTitle = categoryRepository.existCategoryTitle(request.title());
-
-        if (existedCategoryTitle) {
-            throw new CategoryExistException();
-        }
+        validateCategoryTitle(request.title());
 
         Product product = productRepository.findById(request.productId());
         Team team = teamRepository.findById(request.teamId());
@@ -40,15 +36,18 @@ public class CategoryService {
 
     @Transactional
     public void update(CategoryUpdateRequest request, Long categoryId) {
-        boolean existedCategoryTitle = categoryRepository.existCategoryTitle(request.title());
-
-        if (existedCategoryTitle) {
-            throw new CategoryExistException();
-        }
+        validateCategoryTitle(request.title());
 
         Category category = categoryRepository.findById(categoryId);
         Product product = productRepository.findById(request.productId());
 
         category.update(request.title(), product);
     }
+
+    private void validateCategoryTitle(String title) {
+        if (categoryRepository.existCategoryTitle(title)) {
+            throw new CategoryExistException();
+        }
+    }
+
 }

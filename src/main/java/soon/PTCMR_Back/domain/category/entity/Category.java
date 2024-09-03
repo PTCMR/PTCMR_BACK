@@ -12,10 +12,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import soon.PTCMR_Back.domain.category.dto.request.CategoryCreateRequest;
+import lombok.ToString;
 import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.team.entity.Team;
 
+@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
