@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import soon.PTCMR_Back.domain.category.repository.CategoryRepository;
 import soon.PTCMR_Back.domain.product.dto.ProductPaginationDto;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductPaginationRequest;
@@ -29,6 +30,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final TeamRepository teamRepository;
     private final ProductPaginationRepository productPaginationRepository;
+    private final CategoryRepository categoryRepository;
 
     @Transactional
     public Long create(ProductCreateRequest request) {
@@ -40,6 +42,10 @@ public class ProductService {
 
         Product product = Product.create(request);
         productRepository.save(product);
+
+        Team team = teamRepository.findById(request.teamId());
+
+//        Category.create(request.categoryTitle(), team, product);
 
         return product.getId();
     }

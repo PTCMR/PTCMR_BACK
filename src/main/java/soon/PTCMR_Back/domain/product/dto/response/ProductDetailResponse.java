@@ -19,7 +19,9 @@ public record ProductDetailResponse(
 
     boolean repurchase,
 
-    String description
+    String description,
+
+    String category
 ) {
 
     public static ProductDetailResponse from(Product product) {
@@ -31,7 +33,8 @@ public record ProductDetailResponse(
             String.valueOf(product.getStatus()),
             String.valueOf(product.getStorageType()),
             product.isRepurchase(),
-            product.getDescription()
+            product.getDescription(),
+            product.getCategory().getTitle()
         );
     }
 }

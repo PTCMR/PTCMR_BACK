@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import soon.PTCMR_Back.domain.category.entity.Category;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
 import soon.PTCMR_Back.domain.team.entity.Team;
@@ -62,6 +63,10 @@ public class Product extends BaseTimeEntity {
     @JoinColumn(name = "team_id")
     private Team team;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     private Product(ProductCreateRequest request) {
         this.name = request.name();
         this.expirationDate = request.expirationDate();
@@ -70,6 +75,7 @@ public class Product extends BaseTimeEntity {
         this.storageType = StorageType.toStorageType(request.storageType());
         this.repurchase = request.repurchase();
         this.description = request.description();
+//        this.category = request.category()
 
         // TODO S3 연동 후 변겅
         this.imageUrl = request.imageUrl().isEmpty() ? "default image url" : request.imageUrl();
@@ -94,5 +100,6 @@ public class Product extends BaseTimeEntity {
         this.storageType = StorageType.toStorageType(request.storageType());
         this.repurchase = request.repurchase();
         this.description = request.description();
+//        this.category = request.category
     }
 }

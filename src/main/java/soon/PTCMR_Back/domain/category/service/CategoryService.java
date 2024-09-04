@@ -34,9 +34,8 @@ public class CategoryService {
 
         Product product = productRepository.findById(request.productId());
         Team team = teamRepository.findById(request.teamId());
-        Category category = Category.create(request.title(), team, product);
 
-        return categoryRepository.save(category);
+        return null;
     }
 
     @Transactional
@@ -46,7 +45,7 @@ public class CategoryService {
         Category category = categoryRepository.findById(categoryId);
         Product product = productRepository.findById(request.productId());
 
-        category.update(request.title(), product);
+//        category.update(request.title(), product);
     }
 
     private void validateCategoryTitle(String title) {
