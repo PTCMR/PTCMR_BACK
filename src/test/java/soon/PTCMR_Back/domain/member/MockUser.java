@@ -11,6 +11,8 @@ import soon.PTCMR_Back.global.oauth.dto.UserDTO;
 
 public class MockUser {
 
+	public final static String USER_UUID = "kakao 1234";
+
 	public static void createMockUser(){
 		CustomOAuth2User customOAuth2User = new CustomOAuth2User(
 			createMockUserDTO()
@@ -25,7 +27,7 @@ public class MockUser {
 		return UserDTO.builder()
 			.name("test")
 			.provider(SocialType.KAKAO)
-			.uuid("kakao 1234")
+			.uuid(USER_UUID)
 			.build();
 	}
 
