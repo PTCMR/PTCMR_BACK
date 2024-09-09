@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import soon.PTCMR_Back.domain.category.entity.Category;
 import soon.PTCMR_Back.domain.category.repository.CategoryRepository;
 import soon.PTCMR_Back.domain.product.dto.ProductPaginationDto;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
@@ -20,7 +21,6 @@ import soon.PTCMR_Back.domain.product.repository.ProductPaginationRepository;
 import soon.PTCMR_Back.domain.product.repository.ProductRepository;
 import soon.PTCMR_Back.domain.team.entity.Team;
 import soon.PTCMR_Back.domain.team.repository.TeamRepository;
-import soon.PTCMR_Back.global.exception.TeamNotFoundException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,18 +34,21 @@ public class ProductService {
 
     @Transactional
     public Long create(ProductCreateRequest request) {
-        boolean exists = teamRepository.existsById(request.teamId());
-
-        if (!exists) {
-            throw new TeamNotFoundException();
-        }
-
-        Product product = Product.create(request);
-        productRepository.save(product);
-
         Team team = teamRepository.findById(request.teamId());
+        Category category = categoryRepository.findById(request.categoryId());
 
-//        Category.create(request.categoryTitle(), team, product);
+        Product product = Product.create()
+            .name(request.name())
+            .expirationDate(request.expirationDate())
+            .quantity(request.quantity())
+            .imageUrl(request.imageUrl())
+            .storageType(request.storageType())
+            .repurchase(request.repurchase())
+            .description(request.description())
+            .team(team)
+            .category(category)
+            .build();
+        productRepository.save(product);
 
         return product.getId();
     }
@@ -93,7 +96,6 @@ public class ProductService {
             paginatedProducts.remove(PAGE_SIZE);
             return true;
         }
-
         return false;
     }
 }

@@ -37,7 +37,8 @@ public record ProductCreateRequest(
     @Positive(message = "팀 아이디를 제대로 입력하세요.")
     Long teamId,
 
-    String categoryTitle
+    @Positive(message = "카테고리 아이디를 제대로 입력하세요.")
+    Long categoryId
 ) {
 
 }
