@@ -51,11 +51,7 @@ class CategoryServiceTest {
         Team team = TeamData.createTeam(codeGenerator.createInviteCode());
         teamJpaRepository.save(team);
 
-        Product product = createProduct(team.getId());
-        productJpaRepository.save(product);
-
-        CategoryCreateRequest request = new CategoryCreateRequest("testTitle", team.getId(),
-            product.getId());
+        CategoryCreateRequest request = new CategoryCreateRequest("testTitle", team.getId());
         // when
         Long categoryId = categoryService.create(request);
 
@@ -65,7 +61,6 @@ class CategoryServiceTest {
         assertThat(category).isNotNull();
         assertThat(category.getTitle()).isEqualTo("testTitle");
         assertThat(category.getTeam().getId()).isEqualTo(team.getId());
-        assertThat(category.getProduct().getId()).isEqualTo(product.getId());
     }
 
     @Test
@@ -75,13 +70,13 @@ class CategoryServiceTest {
         Team team = TeamData.createTeam(codeGenerator.createInviteCode());
         teamJpaRepository.save(team);
 
-        Product product = createProduct(team.getId());
-        productJpaRepository.save(product);
-
-        Category category = Category.create("testTitle", team, product);
+        Category category = Category.create("testTitle", team);
         categoryJpaRepository.save(category);
 
-        CategoryUpdateRequest request = new CategoryUpdateRequest("new Title", product.getId());
+        Product product = createProduct(team, category);
+        productJpaRepository.save(product);
+
+        CategoryUpdateRequest request = new CategoryUpdateRequest("new Title");
 
         // when
         categoryService.update(request, category.getId());
@@ -89,6 +84,5 @@ class CategoryServiceTest {
         // then
         Category updatedCategory = categoryJpaRepository.findById(category.getId()).get();
         assertThat(updatedCategory.getTitle()).isEqualTo(request.title());
-        assertThat(updatedCategory.getProduct().getId()).isEqualTo(request.productId());
     }
 }
