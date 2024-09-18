@@ -65,13 +65,10 @@ class CategoryControllerTest {
         Team team = TeamData.createTeam(codeGenerator.createInviteCode());
         teamJpaRepository.save(team);
 
-        Product product = createProduct(team.getId());
-        productJpaRepository.save(product);
-
-        CategoryCreateRequest request = new CategoryCreateRequest("testTitle", team.getId(),
-            product.getId());
+        CategoryCreateRequest request = new CategoryCreateRequest("testTitle", team.getId());
 
         String json = objectMapper.writeValueAsString(request);
+
         // expected
         MvcResult result = mockMvc.perform(post("/api/v1/category")
                 .contentType(APPLICATION_JSON)
@@ -92,13 +89,13 @@ class CategoryControllerTest {
         Team team = TeamData.createTeam(codeGenerator.createInviteCode());
         teamJpaRepository.save(team);
 
-        Product product = createProduct(team.getId());
-        productJpaRepository.save(product);
-
-        Category category = Category.create("testTitle", team, product);
+        Category category = Category.create("testTitle", team);
         categoryJpaRepository.save(category);
 
-        CategoryUpdateRequest request = new CategoryUpdateRequest("new Title", product.getId());
+        Product product = createProduct(team, category);
+        productJpaRepository.save(product);
+
+        CategoryUpdateRequest request = new CategoryUpdateRequest("new Title");
         String json = objectMapper.writeValueAsString(request);
 
         // expected

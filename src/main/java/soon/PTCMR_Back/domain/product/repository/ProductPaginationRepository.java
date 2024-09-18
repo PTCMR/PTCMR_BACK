@@ -24,7 +24,7 @@ public class ProductPaginationRepository {
     private final JPAQueryFactory queryFactory;
     public static final int PAGE_SIZE = 10;
 
-    // TODO 카테고리 추가 시 수정
+    // TODO 연관관계 변경으로 인한 페이징 로직 수정 예정
     public List<ProductPaginationDto> getProductList(Long productId, ProductSortOption option,
         String categoryTitle, Team team) {
         final BooleanExpression condition = getProductCondition(productId, option);
@@ -43,8 +43,8 @@ public class ProductPaginationRepository {
                 product.createTime.as("createdDate")
             ))
             .from(product)
-            .leftJoin(category)
-            .on(category.product.id.eq(product.id))
+//            .leftJoin(category)
+//            .on(category.product.id.eq(product.id))
             .where(
                 product.team.eq(team),
                 category.title.eq(categoryTitle),

@@ -3,24 +3,41 @@ package soon.PTCMR_Back.domain.product.entity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import soon.PTCMR_Back.domain.category.entity.Category;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
+import soon.PTCMR_Back.domain.team.entity.Team;
 
 public class ProductTest {
 
-    public static Product createProduct(Long teamId) {
-        return Product.create(new ProductCreateRequest("자일리톨",
-            LocalDateTime.now().plusDays(19), 2, "", StorageType.ROOM_TEMPERATURE.toString(),
-            true, "이것은 자일리톨 껌이요", teamId));
+    public static Product createProduct(Team team, Category category) {
+        return Product.create()
+            .name("자일리톨")
+            .expirationDate(LocalDateTime.now().plusDays(3))
+            .quantity(3)
+            .imageUrl("")
+            .storageType(StorageType.ROOM_TEMPERATURE.toString())
+            .repurchase(true)
+            .description("설명")
+            .team(team)
+            .category(category)
+            .build();
     }
 
-    public static List<Product> pagingSetUp(Long teamId) {
+    public static List<Product> pagingSetUp(Team team, Category category) {
         List<Product> products = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
-            ProductCreateRequest request = new ProductCreateRequest("자일리톨" + i,
-                LocalDateTime.now().plusDays(19), 2, "", StorageType.ROOM_TEMPERATURE.toString(),
-                true, "이것은 자일리톨 껌이요", teamId);
+            Product product = Product.create()
+                .name("자일리톨" + i)
+                .expirationDate(LocalDateTime.now().plusDays(3))
+                .quantity(3)
+                .imageUrl("")
+                .storageType(StorageType.ROOM_TEMPERATURE.toString())
+                .repurchase(true)
+                .description("설명")
+                .team(team)
+                .category(category)
+                .build();
 
-            Product product = Product.create(request);
             products.add(product);
         }
         return products;

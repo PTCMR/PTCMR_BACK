@@ -12,12 +12,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import soon.PTCMR_Back.domain.category.entity.Category;
-import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
 import soon.PTCMR_Back.domain.team.entity.Team;
 import soon.PTCMR_Back.global.entity.BaseTimeEntity;
@@ -67,25 +67,24 @@ public class Product extends BaseTimeEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    private Product(ProductCreateRequest request) {
-        this.name = request.name();
-        this.expirationDate = request.expirationDate();
-        this.quantity = request.quantity();
-        this.status = ProductStatus.getProductStatus(request.expirationDate());
-        this.storageType = StorageType.toStorageType(request.storageType());
-        this.repurchase = request.repurchase();
-        this.description = request.description();
-//        this.category = request.category()
-
-        // TODO S3 연동 후 변겅
-        this.imageUrl = request.imageUrl().isEmpty() ? "default image url" : request.imageUrl();
-
-        // TODO Team 구현 후 변경
+    @Builder
+    private Product(String name, LocalDateTime expirationDate, int quantity,
+        String imageUrl, String storageType, boolean repurchase,
+        String description, Team team, Category category) {
+        this.name = name;
+        this.expirationDate = expirationDate;
+        this.quantity = quantity;
+        this.imageUrl = imageUrl.isEmpty() ? "default image url" : imageUrl;
+        this.storageType = StorageType.toStorageType(storageType);
+        this.repurchase = repurchase;
+        this.description = description;
+        this.category = category;
         this.team = team;
+        this.status = ProductStatus.getProductStatus(expirationDate);
     }
 
-    public static Product create(ProductCreateRequest request) {
-        return new Product(request);
+    public static Product.ProductBuilder create() {
+        return Product.builder();
     }
 
     public void delete() {
