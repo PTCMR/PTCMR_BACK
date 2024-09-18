@@ -43,6 +43,8 @@ public class CategoryService {
 
         Category category = categoryRepository.findById(categoryId);
         category.update(request.title());
+
+//        category.update(request.title(), product);
     }
 
     private void validateCategoryTitle(String title) {
