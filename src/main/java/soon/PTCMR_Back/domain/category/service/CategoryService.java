@@ -53,4 +53,12 @@ public class CategoryService {
         }
     }
 
+    @Transactional
+    public void createDefaultCategoryForTeam(Long teamId) {
+        Team team = teamRepository.findById(teamId);
+        String categoryTitle = team.getTitle() + "의 카테고리";
+        Category category = Category.create(categoryTitle, team);
+
+        categoryRepository.save(category);
+    }
 }

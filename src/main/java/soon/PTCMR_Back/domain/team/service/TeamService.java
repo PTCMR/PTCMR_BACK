@@ -56,6 +56,7 @@ public class TeamService {
 
         teamManager.validateTeamAccess(team, member);
         teamRepository.delete(team);
+
 	}
 
     @Transactional

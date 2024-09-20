@@ -13,5 +13,6 @@ public class TeamEventListener {
 
     @EventListener
     public void handleTeamCreatedEvent(TeamCreateEvent event) {
+        categoryService.createDefaultCategoryForTeam(event.teamId());
     }
 }
