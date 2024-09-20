@@ -31,7 +31,10 @@ public record ProductUpdateRequest(
     boolean repurchase,
 
     @NotEmpty(message = "설명을 입력하세요.")
-    String description
+    String description,
+
+    @NotNull(message = "카테고리를 입력하세요.")
+    String categoryTitle
 ) {
 
 }

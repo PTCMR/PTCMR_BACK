@@ -9,10 +9,7 @@ public record CategoryCreateRequest(
     String title,
 
     @Positive(message = "팀 아이디를 제대로 입력해주세요.")
-    Long teamId,
-
-    @Positive(message = "상품 아이디를 제대로 입력해주세요.")
-    Long productId
+    Long teamId
 ) {
 
 }

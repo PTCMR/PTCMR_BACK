@@ -12,7 +12,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.team.entity.Team;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -31,27 +30,20 @@ public class Category {
     @JoinColumn(name = "team_id")
     private Team team;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    private Product product;
-
     @Builder
-    private Category(String title, Team team, Product product) {
+    public Category(String title, Team team) {
         this.title = title;
         this.team = team;
-        this.product = product;
     }
 
-    public static Category create(String title, Team team, Product product) {
+    public static Category create(String title, Team team) {
         return Category.builder()
             .title(title)
             .team(team)
-            .product(product)
             .build();
     }
 
-    public void update(String title, Product product) {
+    public void update(String title) {
         this.title = title;
-        this.product = product;
     }
 }

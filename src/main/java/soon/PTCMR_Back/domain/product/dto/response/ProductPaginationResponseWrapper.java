@@ -6,8 +6,12 @@ import soon.PTCMR_Back.domain.product.dto.ProductPaginationDto;
 
 @Builder
 public record ProductPaginationResponseWrapper(
+
     List<ProductPaginationDto> products,
-    boolean hasNext
+
+    boolean hasNext,
+
+    String categoryTitle
 ) {
 
 }

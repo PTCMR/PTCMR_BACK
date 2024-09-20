@@ -13,6 +13,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import soon.PTCMR_Back.domain.category.entity.Category;
+import soon.PTCMR_Back.domain.category.repository.CategoryJpaRepository;
 import soon.PTCMR_Back.domain.product.dto.ProductPaginationDto;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductPaginationRequest;
@@ -41,25 +43,32 @@ public class ProductServiceTest {
     @Autowired
     private TeamJpaRepository teamJpaRepository;
 
-    private Long teamId;
+    @Autowired
+    private CategoryJpaRepository categoryJpaRepository;
+
+    private Team team;
+
+    private Category category;
+
 
     @BeforeEach
     void clean() {
         productJpaRepository.deleteAll();
+        categoryJpaRepository.deleteAll();
         teamJpaRepository.deleteAll();
 
         InviteCodeGenerator inviteCodeGenerator = new InviteCodeGenerator();
-        teamId = teamJpaRepository.save(
-            Team.create("title", inviteCodeGenerator.createInviteCode())).getId();
+        team = teamJpaRepository.save(Team.create("title", inviteCodeGenerator.createInviteCode()));
+        category = categoryJpaRepository.save(Category.create("testCategory", team));
     }
 
     @Test
     @DisplayName("상품 자체 등록")
     void productSelfCreate() {
-        // given
+        // given;
         ProductCreateRequest request = new ProductCreateRequest("자일리톨",
-            LocalDateTime.now().plusDays(19), 2, "", StorageType.ROOM_TEMPERATURE.toString(),
-            true, "이것은 자일리톨 껌이요", teamId);
+            LocalDateTime.now().plusDays(19), 4, "", StorageType.FROZEN.toString(),
+            true, "설명", team.getId(), category.getId());
 
         // when
         productService.create(request);
@@ -70,14 +79,13 @@ public class ProductServiceTest {
         Product product = productJpaRepository.findAll().getFirst();
         assertEquals(request.name(), product.getName());
         assertEquals(request.quantity(), product.getQuantity());
-
         assertEquals(ProductStatus.YELLOW, product.getStatus());
     }
 
     @Test
     @DisplayName("상품 삭제")
     void delete() {
-        Product product = createProduct(teamId);
+        Product product = createProduct(team, category);
         productJpaRepository.save(product);
 
         productService.delete(product.getId());
@@ -89,16 +97,16 @@ public class ProductServiceTest {
     @DisplayName("상품 수정")
     void update() {
         // given
-        Product product = createProduct(teamId);
+        Product product = createProduct(team, category);
         productJpaRepository.saveAndFlush(product);
 
         String newName = "자일리톨이 아니라 후라보노";
-        int quantity = 32;
+        int newQuantity = 32;
 
         ProductUpdateRequest request = new ProductUpdateRequest(newName,
-            product.getExpirationDate(), quantity,
-            product.getImageUrl(), product.getStorageType().toString(),
-            product.isRepurchase(), product.getDescription());
+            product.getExpirationDate(), newQuantity, product.getImageUrl(),
+            product.getStorageType().toString(), product.isRepurchase(), product.getDescription(),
+            category.getTitle());
 
         // when
         productService.update(product.getId(), request);
@@ -107,14 +115,14 @@ public class ProductServiceTest {
 
         // then
         assertThat(newName).isEqualTo(updatedProduct.getName());
-        assertThat(quantity).isEqualTo(updatedProduct.getQuantity());
+        assertThat(newQuantity).isEqualTo(updatedProduct.getQuantity());
     }
 
     @Test
     @DisplayName("상품 단건 조회")
     void detailProduct() {
         // given
-        Product product = createProduct(teamId);
+        Product product = createProduct(team, category);
         productJpaRepository.save(product);
 
         // when
@@ -135,7 +143,7 @@ public class ProductServiceTest {
     @DisplayName("상품 페이징 - 첫 페이지")
     void productPaginationFirstPage() {
         // given
-        List<Product> pagingSetUp = pagingSetUp(teamId);
+        List<Product> pagingSetUp = pagingSetUp(team, category);
         productJpaRepository.saveAll(pagingSetUp);
 
         Long lastProductId = null;
@@ -143,7 +151,7 @@ public class ProductServiceTest {
         String category = "";
 
         ProductPaginationRequest request = new ProductPaginationRequest(lastProductId, sortOption,
-            category);
+            category, team.getId());
 
         // when
         ProductPaginationResponseWrapper paginatedProducts = productService.getPaginatedProducts(
@@ -161,7 +169,7 @@ public class ProductServiceTest {
     @DisplayName("상품 페이징 - 마지막 페이지")
     void productPaginationLastPage() {
         // given
-        List<Product> pagingSetUp = pagingSetUp(teamId);
+        List<Product> pagingSetUp = pagingSetUp(team, category);
         productJpaRepository.saveAll(pagingSetUp);
 
         Long lastProductId = pagingSetUp.get(PAGE_SIZE - 1).getId();
@@ -169,7 +177,7 @@ public class ProductServiceTest {
         String category = "";
 
         ProductPaginationRequest request = new ProductPaginationRequest(lastProductId, sortOption,
-            category);
+            category, team.getId());
 
         // when
         ProductPaginationResponseWrapper paginatedProducts = productService.getPaginatedProducts(

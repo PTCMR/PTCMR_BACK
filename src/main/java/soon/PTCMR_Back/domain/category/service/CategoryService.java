@@ -8,8 +8,6 @@ import soon.PTCMR_Back.domain.category.dto.request.CategoryCreateRequest;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryUpdateRequest;
 import soon.PTCMR_Back.domain.category.entity.Category;
 import soon.PTCMR_Back.domain.category.repository.CategoryRepository;
-import soon.PTCMR_Back.domain.product.entity.Product;
-import soon.PTCMR_Back.domain.product.repository.ProductRepository;
 import soon.PTCMR_Back.domain.team.entity.Team;
 import soon.PTCMR_Back.domain.team.repository.TeamRepository;
 import soon.PTCMR_Back.global.exception.CategoryExistException;
@@ -20,7 +18,6 @@ import soon.PTCMR_Back.global.exception.CategoryExistException;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final ProductRepository productRepository;
     private final TeamRepository teamRepository;
 
     @Transactional
@@ -32,11 +29,12 @@ public class CategoryService {
             throw new CategoryExistException();
         }
 
-        Product product = productRepository.findById(request.productId());
         Team team = teamRepository.findById(request.teamId());
-        Category category = Category.create(request.title(), team, product);
 
-        return categoryRepository.save(category);
+        Category category = Category.create(request.title(), team);
+        categoryRepository.save(category);
+
+        return category.getId();
     }
 
     @Transactional
@@ -44,9 +42,9 @@ public class CategoryService {
         validateCategoryTitle(request.title());
 
         Category category = categoryRepository.findById(categoryId);
-        Product product = productRepository.findById(request.productId());
+        category.update(request.title());
 
-        category.update(request.title(), product);
+//        category.update(request.title(), product);
     }
 
     private void validateCategoryTitle(String title) {

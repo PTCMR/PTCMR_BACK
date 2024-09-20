@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
+import soon.PTCMR_Back.domain.category.entity.Category;
+import soon.PTCMR_Back.domain.category.repository.CategoryJpaRepository;
 import soon.PTCMR_Back.domain.product.dto.request.ProductCreateRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductPaginationRequest;
 import soon.PTCMR_Back.domain.product.dto.request.ProductUpdateRequest;
@@ -47,16 +49,22 @@ class ProductControllerTest {
     @Autowired
     private TeamJpaRepository teamJpaRepository;
 
-    private Long teamId;
+    private Team team;
+
+    private Category category;
+
+    @Autowired
+    private CategoryJpaRepository categoryJpaRepository;
 
     @BeforeEach
     void clean() {
         productJpaRepository.deleteAll();
         teamJpaRepository.deleteAll();
+        categoryJpaRepository.deleteAll();
 
         InviteCodeGenerator inviteCodeGenerator = new InviteCodeGenerator();
-        teamId = teamJpaRepository.save(
-            Team.create("title", inviteCodeGenerator.createInviteCode())).getId();
+        team = teamJpaRepository.save(Team.create("title", inviteCodeGenerator.createInviteCode()));
+        category = categoryJpaRepository.save(Category.create("title", team));
     }
 
     @Test
@@ -67,7 +75,7 @@ class ProductControllerTest {
 
         ProductCreateRequest request = new ProductCreateRequest("자일리톨",
             expirationDate, 1, "", "Frozen",
-            true, "이것은 자일리톨 껌이요", teamId);
+            true, "이것은 자일리톨 껌이요", team.getId(), category.getId());
 
         String json = objectMapper.writeValueAsString(request);
 
@@ -83,7 +91,7 @@ class ProductControllerTest {
     @DisplayName("[DELETE] /product 요청 시 상품 삭제")
     void productDelete() throws Exception {
         // given
-        Product product = createProduct(teamId);
+        Product product = createProduct(team, category);
         productJpaRepository.save(product);
 
         // expected
@@ -97,7 +105,7 @@ class ProductControllerTest {
     @DisplayName("[PATCH] /product 요청 시 상품 수정")
     void update() throws Exception {
         // given
-        Product product = createProduct(teamId);
+        Product product = createProduct(team, category);
         productJpaRepository.save(product);
 
         String newName = "후라보노";
@@ -106,7 +114,7 @@ class ProductControllerTest {
         ProductUpdateRequest request = new ProductUpdateRequest(newName,
             product.getExpirationDate(), newQuantity,
             product.getImageUrl(), product.getStorageType().toString(),
-            product.isRepurchase(), product.getDescription());
+            product.isRepurchase(), product.getDescription(), category.getTitle());
 
         String json = objectMapper.writeValueAsString(request);
 
@@ -123,7 +131,7 @@ class ProductControllerTest {
     @DisplayName("[GET] /product/{productId}} 요청 시 상품 단건 조회")
     void detail() throws Exception {
         // given
-        Product product = createProduct(teamId);
+        Product product = createProduct(team, category);
         productJpaRepository.save(product);
 
         // expected
@@ -145,15 +153,15 @@ class ProductControllerTest {
     @DisplayName("[GET] /product 요청 시 상품 페이징 조회")
     void getPaginatedProducts() throws Exception {
         // given
-        List<Product> pagingSetUp = pagingSetUp(teamId);
+        List<Product> pagingSetUp = pagingSetUp(team, category);
         productJpaRepository.saveAll(pagingSetUp);
 
         Long lastProductId = null;
         String sortOption = "CREATE_DATE_DESC";
-        String category = null;
+        String categoryTitle = null;
 
         ProductPaginationRequest request = new ProductPaginationRequest(
-            lastProductId, sortOption, category);
+            lastProductId, sortOption, categoryTitle, team.getId());
 
         String json = objectMapper.writeValueAsString(request);
 
