@@ -95,7 +95,7 @@ class CategoryControllerTest {
         Product product = createProduct(team, category);
         productJpaRepository.save(product);
 
-        CategoryUpdateRequest request = new CategoryUpdateRequest("new Title");
+        CategoryUpdateRequest request = new CategoryUpdateRequest("new Title", team.getId());
         String json = objectMapper.writeValueAsString(request);
 
         // expected

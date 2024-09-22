@@ -11,8 +11,8 @@ public class CategoryRepository {
 
     private final CategoryJpaRepository categoryJpaRepository;
 
-    public boolean existCategoryTitle(String categoryTitle) {
-        return categoryJpaRepository.existsByTitle(categoryTitle);
+    public boolean existsByTitleAndTeamId(String categoryTitle, Long teamId) {
+        return categoryJpaRepository.existsByTitleAndTeamId(categoryTitle, teamId);
     }
 
     public Long save(Category category) {

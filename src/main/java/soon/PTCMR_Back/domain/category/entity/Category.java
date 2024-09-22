@@ -44,6 +44,6 @@ public class Category {
     }
 
     public void update(String title) {
-        this.title = title;
+        this.title = (!this.title.equals("기본")) ? title : this.title;
     }
 }

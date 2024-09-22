@@ -39,9 +39,9 @@ class CategoryServiceTest {
 
     @BeforeEach
     void setUp() {
-        categoryJpaRepository.deleteAll();
-        productJpaRepository.deleteAll();
-        teamJpaRepository.deleteAll();
+//        categoryJpaRepository.deleteAll();
+//        productJpaRepository.deleteAll();
+//        teamJpaRepository.deleteAll();
     }
 
     @Test
@@ -76,7 +76,7 @@ class CategoryServiceTest {
         Product product = createProduct(team, category);
         productJpaRepository.save(product);
 
-        CategoryUpdateRequest request = new CategoryUpdateRequest("new Title");
+        CategoryUpdateRequest request = new CategoryUpdateRequest("new Title", team.getId());
 
         // when
         categoryService.update(request, category.getId());
@@ -84,5 +84,16 @@ class CategoryServiceTest {
         // then
         Category updatedCategory = categoryJpaRepository.findById(category.getId()).get();
         assertThat(updatedCategory.getTitle()).isEqualTo(request.title());
+    }
+
+    @Test
+    @DisplayName("기본 카테고리 수정 시 실패")
+    void defaultCategoryUpdate() {
+        // given
+
+
+        // when
+
+        // then
     }
 }
