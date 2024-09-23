@@ -137,6 +137,5 @@ class CategoryControllerTest {
             )
             .andExpect(status().isNoContent())
             .andDo(print());
-        ;
     }
 }
