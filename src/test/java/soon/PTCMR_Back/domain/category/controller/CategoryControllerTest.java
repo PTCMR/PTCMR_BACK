@@ -2,6 +2,7 @@ package soon.PTCMR_Back.domain.category.controller;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -10,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +20,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryCreateRequest;
+import soon.PTCMR_Back.domain.category.dto.request.CategoryDeleteRequest;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryUpdateRequest;
 import soon.PTCMR_Back.domain.category.entity.Category;
 import soon.PTCMR_Back.domain.category.repository.CategoryJpaRepository;
@@ -27,6 +31,7 @@ import soon.PTCMR_Back.domain.product.repository.ProductJpaRepository;
 import soon.PTCMR_Back.domain.team.data.TeamData;
 import soon.PTCMR_Back.domain.team.entity.Team;
 import soon.PTCMR_Back.domain.team.repository.TeamJpaRepository;
+import soon.PTCMR_Back.domain.team.service.TeamService;
 import soon.PTCMR_Back.global.util.invite.InviteCodeGenerator;
 
 @AutoConfigureMockMvc(addFilters = false)
@@ -51,11 +56,14 @@ class CategoryControllerTest {
     @Autowired
     InviteCodeGenerator codeGenerator;
 
+    @Autowired
+    TeamService teamService;
+
     @BeforeEach
     void setUp() {
-        categoryJpaRepository.deleteAll();
-        productJpaRepository.deleteAll();
-        teamJpaRepository.deleteAll();
+//        categoryJpaRepository.deleteAll();
+//        productJpaRepository.deleteAll();
+//        teamJpaRepository.deleteAll();
     }
 
     @Test
@@ -105,5 +113,30 @@ class CategoryControllerTest {
             )
             .andExpect(status().isNoContent())
             .andDo(print());
+    }
+
+    @Test
+    @DisplayName("[DELETE] api/v1/category 요청 시 카테고리 삭제")
+    void deleteCategoryAndReassignProducts() throws Exception {
+        // given
+        Long teamId = teamService.create(String.valueOf(UUID.randomUUID()), "testTeamTitle");
+        Team team = teamJpaRepository.findById(teamId).get();
+
+        Category category = Category.create("testTitle", team);
+        categoryJpaRepository.save(category);
+
+        Product product = createProduct(team, category);
+        productJpaRepository.save(product);
+
+        CategoryDeleteRequest request = new CategoryDeleteRequest(category.getId(), team.getId());
+
+        // expected
+        mockMvc.perform(delete("/api/v1/category")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+            )
+            .andExpect(status().isNoContent())
+            .andDo(print());
+        ;
     }
 }

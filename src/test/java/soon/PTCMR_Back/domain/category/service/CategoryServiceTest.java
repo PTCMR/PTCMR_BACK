@@ -142,7 +142,7 @@ class CategoryServiceTest {
         categoryJpaRepository.save(category);
 
         Product product = createProduct(team, category);
-        productJpaRepository.saveAndFlush(product);
+        productJpaRepository.save(product);
 
         CategoryDeleteRequest request = new CategoryDeleteRequest(category.getId(), team.getId());
 
