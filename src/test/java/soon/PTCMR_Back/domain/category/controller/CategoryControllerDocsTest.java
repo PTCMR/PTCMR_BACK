@@ -2,11 +2,15 @@ package soon.PTCMR_Back.domain.category.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
@@ -21,6 +25,10 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryCreateRequest;
+import soon.PTCMR_Back.domain.category.dto.request.CategoryUpdateRequest;
+import soon.PTCMR_Back.domain.category.entity.Category;
+import soon.PTCMR_Back.domain.category.repository.CategoryJpaRepository;
+import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.product.repository.ProductJpaRepository;
 import soon.PTCMR_Back.domain.team.data.TeamData;
 import soon.PTCMR_Back.domain.team.entity.Team;
@@ -46,7 +54,10 @@ public class CategoryControllerDocsTest {
     private InviteCodeGenerator codeGenerator;
 
     @Autowired
-    TeamJpaRepository teamJpaRepository;
+    private TeamJpaRepository teamJpaRepository;
+
+    @Autowired
+    private CategoryJpaRepository categoryJpaRepository;
 
     @Test
     @DisplayName("[POST] api/v1/category 요청 시 카테고리 생성")
@@ -62,8 +73,7 @@ public class CategoryControllerDocsTest {
         // expected
         mockMvc.perform(post("/api/v1/category")
                 .contentType(APPLICATION_JSON)
-                .content(json)
-            )
+                .content(json))
             .andExpect(status().isCreated())
             .andDo(print())
             .andDo(document("category-create",
@@ -72,5 +82,36 @@ public class CategoryControllerDocsTest {
                     fieldWithPath("teamId").description("팀 아이디")
                 ))
             );
+    }
+
+    @Test
+    @DisplayName("[PATCH] api/v1/category/{categoryId} 요청 시 카테고리 수정")
+    void update() throws Exception {
+        // given
+        Team team = TeamData.createTeam(codeGenerator.createInviteCode());
+        teamJpaRepository.save(team);
+
+        Category category = Category.create("testTitle", team);
+        categoryJpaRepository.save(category);
+
+        Product product = createProduct(team, category);
+        productJpaRepository.save(product);
+
+        CategoryUpdateRequest request = new CategoryUpdateRequest("new Title", team.getId());
+        String json = objectMapper.writeValueAsString(request);
+
+        // expected
+        mockMvc.perform(patch("/api/v1/category/{categoryId}", category.getId())
+                .contentType(APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isNoContent())
+            .andDo(print())
+            .andDo(document("category-update",
+                pathParameters(parameterWithName("categoryId").description("카테고리 아이디")),
+                requestFields(
+                    fieldWithPath("title").description("카테고리 제목"),
+                    fieldWithPath("teamId").description("팀 아이디")
+                )
+            ));
     }
 }
