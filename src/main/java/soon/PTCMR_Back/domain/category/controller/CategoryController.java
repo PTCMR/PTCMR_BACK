@@ -31,15 +31,9 @@ public class CategoryController {
     }
 
     @PatchMapping("/{categoryId}")
-    public ResponseEntity<Void> update(@RequestBody @Valid CategoryUpdateRequest request,
-        @PathVariable Long categoryId) {
+    public ResponseEntity<Void> update(@RequestBody @Valid CategoryUpdateRequest request, @PathVariable Long categoryId) {
         categoryService.update(request, categoryId);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create("/api/v1/category"));
-
-        return ResponseEntity.status(HttpStatus.FOUND)
-            .headers(headers)
-            .build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

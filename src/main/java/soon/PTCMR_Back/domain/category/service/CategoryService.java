@@ -22,15 +22,9 @@ public class CategoryService {
 
     @Transactional
     public Long create(CategoryCreateRequest request) {
-        validateCategoryTitle(request.title(), request.teamId());
-        boolean existedCategoryTitle = categoryRepository.existsByTitleAndTeamId(request.title(), request.teamId());
-
-        if (existedCategoryTitle) {
-            throw new CategoryExistException();
-        }
+        validateCategoryExistsForTeam(request.title(), request.teamId());
 
         Team team = teamRepository.findById(request.teamId());
-
         Category category = Category.create(request.title(), team);
         categoryRepository.save(category);
 
@@ -39,13 +33,14 @@ public class CategoryService {
 
     @Transactional
     public void update(CategoryUpdateRequest request, Long categoryId) {
-        validateCategoryTitle(request.title(), request.teamId());
+        validateCategoryExistsForTeam(request.title(), request.teamId());
 
-        Category category = categoryRepository.findById(categoryId);
+        Category category = categoryRepository.findByIdAndTeamId(categoryId, request.teamId());
         category.update(request.title());
+
     }
 
-    private void validateCategoryTitle(String title, Long teamId) {
+    private void validateCategoryExistsForTeam(String title, Long teamId) {
         if (categoryRepository.existsByTitleAndTeamId(title, teamId)) {
             throw new CategoryExistException();
         }

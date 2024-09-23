@@ -103,7 +103,7 @@ class CategoryControllerTest {
                 .contentType(APPLICATION_JSON)
                 .content(json)
             )
-            .andExpect(status().isFound())
+            .andExpect(status().isNoContent())
             .andDo(print());
     }
 }

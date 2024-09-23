@@ -1,8 +1,9 @@
 package soon.PTCMR_Back.domain.category.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,11 +13,12 @@ import soon.PTCMR_Back.domain.category.dto.request.CategoryCreateRequest;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryUpdateRequest;
 import soon.PTCMR_Back.domain.category.entity.Category;
 import soon.PTCMR_Back.domain.category.repository.CategoryJpaRepository;
-import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.product.repository.ProductJpaRepository;
 import soon.PTCMR_Back.domain.team.data.TeamData;
 import soon.PTCMR_Back.domain.team.entity.Team;
 import soon.PTCMR_Back.domain.team.repository.TeamJpaRepository;
+import soon.PTCMR_Back.domain.team.service.TeamService;
+import soon.PTCMR_Back.global.exception.CannotModifyDefaultCategoryException;
 import soon.PTCMR_Back.global.util.invite.InviteCodeGenerator;
 
 @SpringBootTest
@@ -36,6 +38,9 @@ class CategoryServiceTest {
 
     @Autowired
     InviteCodeGenerator codeGenerator;
+
+    @Autowired
+    private TeamService teamService;
 
     @BeforeEach
     void setUp() {
@@ -73,9 +78,6 @@ class CategoryServiceTest {
         Category category = Category.create("testTitle", team);
         categoryJpaRepository.save(category);
 
-        Product product = createProduct(team, category);
-        productJpaRepository.save(product);
-
         CategoryUpdateRequest request = new CategoryUpdateRequest("new Title", team.getId());
 
         // when
@@ -90,10 +92,14 @@ class CategoryServiceTest {
     @DisplayName("기본 카테고리 수정 시 실패")
     void defaultCategoryUpdate() {
         // given
+        Long teamId = teamService.create(String.valueOf(UUID.randomUUID()), "testTeamTitle");
+        Category category = categoryJpaRepository.findByTitleAndTeamId("기본", teamId).get();
 
-
-        // when
+        CategoryUpdateRequest request = new CategoryUpdateRequest("new category title", teamId);
 
         // then
+        assertThrows(CannotModifyDefaultCategoryException.class,
+            () -> categoryService.update(request, category.getId())
+        );
     }
 }

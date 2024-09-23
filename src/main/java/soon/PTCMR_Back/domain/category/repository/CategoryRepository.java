@@ -19,9 +19,10 @@ public class CategoryRepository {
         return categoryJpaRepository.save(category).getId();
     }
 
-    public Category findById(Long id) {
-        return categoryJpaRepository.findById(id).orElseThrow(
+    public Category findByIdAndTeamId(Long categoryId, Long teamId) {
+        return categoryJpaRepository.findByIdAndTeamId(categoryId, teamId).orElseThrow(
             CategoryNotFoundException::new
         );
     }
+
 }
