@@ -19,4 +19,8 @@ public class ProductRepository {
         return productJpaRepository.findById(id)
             .orElseThrow(ProductNotFoundException::new);
     }
+
+    public void updateCategoryForProducts(Long categoryId, Long defaultCategoryId) {
+        productJpaRepository.updateCategoryForProducts(categoryId, defaultCategoryId);
+    }
 }

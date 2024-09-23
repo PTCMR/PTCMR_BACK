@@ -25,4 +25,13 @@ public class CategoryRepository {
         );
     }
 
+    public Category findByDefaultCategoryWithTeamId(Long teamId) {
+        return categoryJpaRepository.findByTitleAndTeamId("기본", teamId).orElseThrow(
+            CategoryNotFoundException::new
+        );
+    }
+
+    public void delete(Category category) {
+        categoryJpaRepository.delete(category);
+    }
 }
