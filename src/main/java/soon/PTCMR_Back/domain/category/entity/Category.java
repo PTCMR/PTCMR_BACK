@@ -32,7 +32,7 @@ public class Category {
     private Team team;
 
     @Builder
-    public Category(String title, Team team) {
+    private Category(String title, Team team) {
         this.title = title;
         this.team = team;
     }
