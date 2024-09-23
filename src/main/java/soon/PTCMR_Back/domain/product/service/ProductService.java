@@ -99,9 +99,4 @@ public class ProductService {
         }
         return false;
     }
-
-    @Transactional
-    public void setDefaultCategory(List<Product> products, Category category) {
-        products.forEach(product -> product.setDefaultCategory(category));
-    }
 }

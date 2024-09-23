@@ -101,8 +101,4 @@ public class Product extends BaseTimeEntity {
         this.description = request.description();
 //        this.category = request.category
     }
-
-    public void setDefaultCategory(Category category) {
-        this.category = category;
-    }
 }

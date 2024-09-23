@@ -2,7 +2,9 @@ package soon.PTCMR_Back.domain.category.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
 
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,9 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryCreateRequest;
+import soon.PTCMR_Back.domain.category.dto.request.CategoryDeleteRequest;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryUpdateRequest;
 import soon.PTCMR_Back.domain.category.entity.Category;
 import soon.PTCMR_Back.domain.category.repository.CategoryJpaRepository;
+import soon.PTCMR_Back.domain.product.entity.Product;
 import soon.PTCMR_Back.domain.product.repository.ProductJpaRepository;
 import soon.PTCMR_Back.domain.team.data.TeamData;
 import soon.PTCMR_Back.domain.team.entity.Team;
@@ -100,6 +104,56 @@ class CategoryServiceTest {
         // then
         assertThrows(CannotModifyDefaultCategoryException.class,
             () -> categoryService.update(request, category.getId())
+        );
+    }
+
+    @Test
+    @DisplayName("기본 카테고리 재할당")
+    void reassignProductsToDefaultCategory() {
+        // given
+        Long teamId = teamService.create(String.valueOf(UUID.randomUUID()), "testTeamTitle");
+        Team team = teamJpaRepository.findById(teamId).get();
+
+        Category category = Category.create("testTitle", team);
+        Category defaultCategory = categoryJpaRepository.findByTitleAndTeamId("기본", teamId).get();
+        categoryJpaRepository.save(category);
+
+        Product product = createProduct(team, category);
+        productJpaRepository.saveAndFlush(product);
+
+        // when
+        categoryService.reassignProductsToDefaultCategory(category.getId(), defaultCategory.getId());
+
+        // then
+        Product updatedProduct = productJpaRepository.findById(product.getId()).get();
+        assertThat(updatedProduct).isNotNull();
+        assertThat(updatedProduct.getCategory().getId()).isEqualTo(defaultCategory.getId());
+    }
+
+    @Test
+    @DisplayName("카테고리 삭제")
+    void deleteCategoryAndReassignProducts() {
+        // given
+        Long teamId = teamService.create(String.valueOf(UUID.randomUUID()), "testTeamTitle");
+        Team team = teamJpaRepository.findById(teamId).get();
+
+        Category category = Category.create("testTitle", team);
+        Category defaultCategory = categoryJpaRepository.findByTitleAndTeamId("기본", teamId).get();
+        categoryJpaRepository.save(category);
+
+        Product product = createProduct(team, category);
+        productJpaRepository.saveAndFlush(product);
+
+        CategoryDeleteRequest request = new CategoryDeleteRequest(category.getId(), team.getId());
+
+        // when
+        categoryService.deleteCategoryAndReassignProducts(request);
+
+        // then
+        Product updatedProduct = productJpaRepository.findById(product.getId()).get();
+        assertThat(updatedProduct.getCategory().getId()).isEqualTo(defaultCategory.getId());
+        assertThrows(NoSuchElementException.class,
+            () -> categoryJpaRepository.findById(category.getId()).get()
         );
     }
 }
