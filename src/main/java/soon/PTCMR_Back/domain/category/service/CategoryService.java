@@ -22,15 +22,9 @@ public class CategoryService {
 
     @Transactional
     public Long create(CategoryCreateRequest request) {
-        validateCategoryTitle(request.title());
-        boolean existedCategoryTitle = categoryRepository.existCategoryTitle(request.title());
-
-        if (existedCategoryTitle) {
-            throw new CategoryExistException();
-        }
+        validateCategoryExistsForTeam(request.title(), request.teamId());
 
         Team team = teamRepository.findById(request.teamId());
-
         Category category = Category.create(request.title(), team);
         categoryRepository.save(category);
 
@@ -39,16 +33,15 @@ public class CategoryService {
 
     @Transactional
     public void update(CategoryUpdateRequest request, Long categoryId) {
-        validateCategoryTitle(request.title());
+        validateCategoryExistsForTeam(request.title(), request.teamId());
 
-        Category category = categoryRepository.findById(categoryId);
+        Category category = categoryRepository.findByIdAndTeamId(categoryId, request.teamId());
         category.update(request.title());
 
-//        category.update(request.title(), product);
     }
 
-    private void validateCategoryTitle(String title) {
-        if (categoryRepository.existCategoryTitle(title)) {
+    private void validateCategoryExistsForTeam(String title, Long teamId) {
+        if (categoryRepository.existsByTitleAndTeamId(title, teamId)) {
             throw new CategoryExistException();
         }
     }
@@ -56,8 +49,7 @@ public class CategoryService {
     @Transactional
     public void createDefaultCategoryForTeam(Long teamId) {
         Team team = teamRepository.findById(teamId);
-        String categoryTitle = team.getTitle() + "의 카테고리";
-        Category category = Category.create(categoryTitle, team);
+        Category category = Category.create("기본", team);
 
         categoryRepository.save(category);
     }
