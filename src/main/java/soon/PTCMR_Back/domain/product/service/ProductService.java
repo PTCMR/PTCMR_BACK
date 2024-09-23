@@ -35,7 +35,8 @@ public class ProductService {
     @Transactional
     public Long create(ProductCreateRequest request) {
         Team team = teamRepository.findById(request.teamId());
-        Category category = categoryRepository.findByIdAndTeamId(request.categoryId(), team.getId());
+        Category category = categoryRepository.findByIdAndTeamId(request.categoryId(),
+            team.getId());
 
         Product product = Product.create()
             .name(request.name())
@@ -97,5 +98,10 @@ public class ProductService {
             return true;
         }
         return false;
+    }
+
+    @Transactional
+    public void setDefaultCategory(List<Product> products, Category category) {
+        products.forEach(product -> product.setDefaultCategory(category));
     }
 }
