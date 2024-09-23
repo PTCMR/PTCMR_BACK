@@ -11,6 +11,8 @@ public class CategoryRepository {
 
     private final CategoryJpaRepository categoryJpaRepository;
 
+    public static final String DEFAULT_CATEGORY_TITLE = "기본";
+
     public boolean existsByTitleAndTeamId(String categoryTitle, Long teamId) {
         return categoryJpaRepository.existsByTitleAndTeamId(categoryTitle, teamId);
     }
@@ -20,15 +22,13 @@ public class CategoryRepository {
     }
 
     public Category findByIdAndTeamId(Long categoryId, Long teamId) {
-        return categoryJpaRepository.findByIdAndTeamId(categoryId, teamId).orElseThrow(
-            CategoryNotFoundException::new
-        );
+        return categoryJpaRepository.findByIdAndTeamId(categoryId, teamId)
+            .orElseThrow(CategoryNotFoundException::new);
     }
 
     public Category findByDefaultCategoryWithTeamId(Long teamId) {
-        return categoryJpaRepository.findByTitleAndTeamId("기본", teamId).orElseThrow(
-            CategoryNotFoundException::new
-        );
+        return categoryJpaRepository.findByTitleAndTeamId(DEFAULT_CATEGORY_TITLE, teamId)
+            .orElseThrow(CategoryNotFoundException::new);
     }
 
     public void delete(Category category) {
