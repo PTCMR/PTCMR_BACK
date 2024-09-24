@@ -47,7 +47,7 @@ public class ProductPaginationRepository {
 //            .on(category.product.id.eq(product.id))
             .where(
                 product.team.eq(team),
-                category.title.eq(categoryTitle),
+//                category.title.eq(categoryTitle),
                 condition
             )
             .orderBy(getOrderSpecifier(option))

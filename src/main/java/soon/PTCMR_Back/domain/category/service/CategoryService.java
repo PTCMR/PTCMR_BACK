@@ -1,15 +1,21 @@
 package soon.PTCMR_Back.domain.category.service;
 
+import static soon.PTCMR_Back.domain.category.repository.CategoryPaginationRepository.PAGE_SIZE;
 import static soon.PTCMR_Back.domain.category.repository.CategoryRepository.DEFAULT_CATEGORY_TITLE;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import soon.PTCMR_Back.domain.category.dto.CategoryPaginationDto;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryCreateRequest;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryDeleteRequest;
+import soon.PTCMR_Back.domain.category.dto.request.CategoryPaginationRequest;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryUpdateRequest;
+import soon.PTCMR_Back.domain.category.dto.response.CategoryPaginationResponseWrapper;
 import soon.PTCMR_Back.domain.category.entity.Category;
+import soon.PTCMR_Back.domain.category.repository.CategoryPaginationRepository;
 import soon.PTCMR_Back.domain.category.repository.CategoryRepository;
 import soon.PTCMR_Back.domain.product.repository.ProductRepository;
 import soon.PTCMR_Back.domain.team.entity.Team;
@@ -24,6 +30,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final TeamRepository teamRepository;
     private final ProductRepository productRepository;
+    private final CategoryPaginationRepository categoryPaginationRepository;
 
     @Transactional
     public Long create(CategoryCreateRequest request) {
@@ -74,5 +81,29 @@ public class CategoryService {
         if (categoryRepository.existsByTitleAndTeamId(title, teamId)) {
             throw new CategoryExistException();
         }
+    }
+
+    @Transactional(readOnly = true)
+    public CategoryPaginationResponseWrapper getPaginatedCategories(
+        CategoryPaginationRequest request) {
+        Team team = teamRepository.findById(request.teamId());
+
+        List<CategoryPaginationDto> paginatedCategories = categoryPaginationRepository.getCategoryList(
+            request.lastCategoryId(), team);
+
+        boolean hasNext = determineHasNextPage(paginatedCategories);
+
+        return CategoryPaginationResponseWrapper.builder()
+            .categories(paginatedCategories)
+            .hasNext(hasNext)
+            .build();
+    }
+
+    private boolean determineHasNextPage(List<CategoryPaginationDto> paginatedList) {
+        if (paginatedList.size() > PAGE_SIZE) {
+            paginatedList.remove(PAGE_SIZE);
+            return true;
+        }
+        return false;
     }
 }
