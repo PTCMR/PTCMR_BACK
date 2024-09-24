@@ -64,8 +64,9 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<ProductPaginationResponseWrapper> getPaginatedProducts(
-        @RequestBody ProductPaginationRequest request) {
-        ProductPaginationResponseWrapper paginatedProducts = productService.getPaginatedProducts(request);
+        @RequestBody @Valid ProductPaginationRequest request) {
+        ProductPaginationResponseWrapper paginatedProducts = productService.getPaginatedProducts(
+            request);
 
         return ResponseEntity.status(HttpStatus.OK).body(paginatedProducts);
     }

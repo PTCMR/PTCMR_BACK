@@ -3,6 +3,7 @@ package soon.PTCMR_Back.domain.category.controller;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -12,6 +13,7 @@ import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryCreateRequest;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryDeleteRequest;
+import soon.PTCMR_Back.domain.category.dto.request.CategoryPaginationRequest;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryUpdateRequest;
 import soon.PTCMR_Back.domain.category.entity.Category;
 import soon.PTCMR_Back.domain.category.repository.CategoryJpaRepository;
@@ -136,6 +139,29 @@ class CategoryControllerTest {
                 .content(objectMapper.writeValueAsString(request))
             )
             .andExpect(status().isNoContent())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("[GET] api/v1/category 요청 시 카테고리 페이징")
+    void categoryPaginationList() throws Exception {
+        // given
+        Long teamId = teamService.create(String.valueOf(UUID.randomUUID()), "testTeamTitle");
+        Team team = teamJpaRepository.findById(teamId).get();
+
+        for (int i = 0; i < 5; i++) {
+            Category category = Category.create("title" + i, team);
+            categoryJpaRepository.save(category);
+        }
+
+        CategoryPaginationRequest request = new CategoryPaginationRequest(null, teamId);
+
+        // expected
+        mockMvc.perform(get("/api/v1/category")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+            )
+            .andExpect(status().isOk())
             .andDo(print());
     }
 }
