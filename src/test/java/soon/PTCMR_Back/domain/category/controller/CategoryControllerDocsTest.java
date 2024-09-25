@@ -3,6 +3,7 @@ package soon.PTCMR_Back.domain.category.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -15,7 +16,6 @@ import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,11 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryCreateRequest;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryDeleteRequest;
+import soon.PTCMR_Back.domain.category.dto.request.CategoryPaginationRequest;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryUpdateRequest;
 import soon.PTCMR_Back.domain.category.entity.Category;
 import soon.PTCMR_Back.domain.category.repository.CategoryJpaRepository;
@@ -148,6 +148,35 @@ public class CategoryControllerDocsTest {
             .andDo(document("category-delete",
                 requestFields(
                     fieldWithPath("categoryId").description("카테고리 아이디"),
+                    fieldWithPath("teamId").description("팀 아이디")
+                )
+            ));
+    }
+
+    @Test
+    @DisplayName("[GET] api/v1/category 요청 시 카테고리 페이징")
+    void categoryPaginationList() throws Exception {
+        // given
+        Long teamId = teamService.create(String.valueOf(UUID.randomUUID()), "testTeamTitle");
+        Team team = teamJpaRepository.findById(teamId).get();
+
+        for (int i = 0; i < 5; i++) {
+            Category category = Category.create("title" + i, team);
+            categoryJpaRepository.save(category);
+        }
+
+        CategoryPaginationRequest request = new CategoryPaginationRequest(null, teamId);
+
+        // expected
+        mockMvc.perform(get("/api/v1/category")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+            )
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document("category-pagination",
+                requestFields(
+                    fieldWithPath("lastCategoryId").description("마지막으로 전달 받은 카테고리 아이디"),
                     fieldWithPath("teamId").description("팀 아이디")
                 )
             ));
