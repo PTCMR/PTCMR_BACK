@@ -66,9 +66,9 @@ public class ProductControllerDocsTest {
 
     @BeforeEach
     void clean() {
-        productJpaRepository.deleteAll();
-        teamJpaRepository.deleteAll();
-        categoryJpaRepository.deleteAll();
+//        productJpaRepository.deleteAll();
+//        teamJpaRepository.deleteAll();
+//        categoryJpaRepository.deleteAll();
 
         InviteCodeGenerator inviteCodeGenerator = new InviteCodeGenerator();
         team = teamJpaRepository.save(Team.create("title", inviteCodeGenerator.createInviteCode()));
@@ -103,7 +103,8 @@ public class ProductControllerDocsTest {
                     fieldWithPath("storageType").description("보관 방법"),
                     fieldWithPath("repurchase").description("재구매 여부"),
                     fieldWithPath("description").description("설명"),
-                    fieldWithPath("teamId").description("팀 번호")
+                    fieldWithPath("teamId").description("팀 번호"),
+                    fieldWithPath("categoryId").description("카테고리 번호")
                 )
             ));
     }
@@ -156,7 +157,8 @@ public class ProductControllerDocsTest {
                     fieldWithPath("imageUrl").description("이미지 주소"),
                     fieldWithPath("storageType").description("보관 방법"),
                     fieldWithPath("repurchase").description("재구매 여부"),
-                    fieldWithPath("description").description("상품 설명")
+                    fieldWithPath("description").description("상품 설명"),
+                    fieldWithPath("categoryTitle").description("카테고리 제목")
                 )
             ));
     }
@@ -205,7 +207,8 @@ public class ProductControllerDocsTest {
                 requestFields(
                     fieldWithPath("lastProductId").description("마지막 상품 아이디"),
                     fieldWithPath("sortOption").description("정렬 조건"),
-                    fieldWithPath("keyword").description("카테고리 [미구현]")
+                    fieldWithPath("categoryTitle").description("카테고리 제목"),
+                    fieldWithPath("teamId").description("팀 아이디")
                 )
             ));
 

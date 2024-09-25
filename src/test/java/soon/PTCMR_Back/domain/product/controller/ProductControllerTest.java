@@ -58,9 +58,9 @@ class ProductControllerTest {
 
     @BeforeEach
     void clean() {
-        productJpaRepository.deleteAll();
-        teamJpaRepository.deleteAll();
-        categoryJpaRepository.deleteAll();
+//        productJpaRepository.deleteAll();
+//        teamJpaRepository.deleteAll();
+//        categoryJpaRepository.deleteAll();
 
         InviteCodeGenerator inviteCodeGenerator = new InviteCodeGenerator();
         team = teamJpaRepository.save(Team.create("title", inviteCodeGenerator.createInviteCode()));

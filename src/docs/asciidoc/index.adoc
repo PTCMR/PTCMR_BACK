@@ -116,3 +116,53 @@ include::{snippets}/team-invite/request-fields.adoc
 === 응답
 
 include::{snippets}/team-invite/http-response.adoc[]
+
+== 카테고리 생성
+
+=== 요청
+
+include::{snippets}/category-create/http-request.adoc[]
+
+include::{snippets}/category-create/request-fields.adoc[]
+
+=== 응답
+
+include::{snippets}/category-create/http-response.adoc[]
+
+== 카테고리 수정
+
+=== 요청
+
+include::{snippets}/category-update/http-request.adoc[]
+
+include::{snippets}/category-update/request-fields.adoc[]
+
+include::{snippets}/category-update/path-parameters.adoc[]
+
+=== 응답
+
+include::{snippets}/category-update/http-response.adoc[]
+
+== 카테고리 삭제
+
+=== 요청
+
+include::{snippets}/category-delete/http-request.adoc[]
+
+include::{snippets}/category-delete/request-fields.adoc[]
+
+=== 응답
+
+include::{snippets}/category-delete/http-response.adoc[]
+
+== 카테고리 페이징
+
+=== 요청
+
+include::{snippets}/category-pagination/http-request.adoc[]
+
+include::{snippets}/category-pagination/request-fields.adoc[]
+
+=== 응답
+
+include::{snippets}/category-pagination/http-response.adoc[]
