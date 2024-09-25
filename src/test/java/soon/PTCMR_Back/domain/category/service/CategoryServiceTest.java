@@ -2,18 +2,24 @@ package soon.PTCMR_Back.domain.category.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static soon.PTCMR_Back.domain.category.repository.CategoryPaginationRepository.PAGE_SIZE;
 import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import soon.PTCMR_Back.domain.category.dto.CategoryPaginationDto;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryCreateRequest;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryDeleteRequest;
+import soon.PTCMR_Back.domain.category.dto.request.CategoryPaginationRequest;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryUpdateRequest;
+import soon.PTCMR_Back.domain.category.dto.response.CategoryPaginationResponseWrapper;
 import soon.PTCMR_Back.domain.category.entity.Category;
 import soon.PTCMR_Back.domain.category.repository.CategoryJpaRepository;
 import soon.PTCMR_Back.domain.product.entity.Product;
@@ -122,7 +128,8 @@ class CategoryServiceTest {
         productJpaRepository.saveAndFlush(product);
 
         // when
-        categoryService.reassignProductsToDefaultCategory(category.getId(), defaultCategory.getId());
+        categoryService.reassignProductsToDefaultCategory(category.getId(),
+            defaultCategory.getId());
 
         // then
         Product updatedProduct = productJpaRepository.findById(product.getId()).get();
@@ -155,5 +162,32 @@ class CategoryServiceTest {
         assertThrows(NoSuchElementException.class,
             () -> categoryJpaRepository.findById(category.getId()).get()
         );
+    }
+
+    @Test
+    @DisplayName("카테고리 페이징")
+    void categoryPagination() {
+        // given
+        Long teamId = teamService.create(String.valueOf(UUID.randomUUID()), "testTeamTitle");
+        Team team = teamJpaRepository.findById(teamId).get();
+
+        for (int i = 0; i < 5; i++) {
+            Category category = Category.create("title" + i, team);
+            categoryJpaRepository.save(category);
+        }
+
+        CategoryPaginationRequest request = new CategoryPaginationRequest(null,
+            team.getId());
+
+        // when
+        CategoryPaginationResponseWrapper response = categoryService.getPaginatedCategories(
+            request);
+        List<CategoryPaginationDto> categories = response.categories();
+        boolean hasNext = response.hasNext();
+
+        // then
+        assertThat(categories).isNotNull();
+        assertThat(categories.size()).isEqualTo(PAGE_SIZE);
+        assertThat(hasNext).isTrue();
     }
 }
