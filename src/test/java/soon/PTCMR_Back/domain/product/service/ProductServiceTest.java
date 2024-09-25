@@ -54,8 +54,8 @@ public class ProductServiceTest {
     @BeforeEach
     void clean() {
         productJpaRepository.deleteAll();
-        categoryJpaRepository.deleteAll();
-        teamJpaRepository.deleteAll();
+//        categoryJpaRepository.deleteAll();
+//        teamJpaRepository.deleteAll();
 
         InviteCodeGenerator inviteCodeGenerator = new InviteCodeGenerator();
         team = teamJpaRepository.save(Team.create("title", inviteCodeGenerator.createInviteCode()));
@@ -71,15 +71,15 @@ public class ProductServiceTest {
             true, "설명", team.getId(), category.getId());
 
         // when
-        productService.create(request);
+        Long savedProductId = productService.create(request);
 
         // then
-        assertThat(productJpaRepository.count()).isEqualTo(1);
+        Product savedProduct = productJpaRepository.findById(savedProductId).get();
 
-        Product product = productJpaRepository.findAll().getFirst();
-        assertEquals(request.name(), product.getName());
-        assertEquals(request.quantity(), product.getQuantity());
-        assertEquals(ProductStatus.YELLOW, product.getStatus());
+        assertThat(savedProduct).isNotNull();
+        assertEquals(request.name(), savedProduct.getName());
+        assertEquals(request.quantity(), savedProduct.getQuantity());
+        assertEquals(ProductStatus.YELLOW, savedProduct.getStatus());
     }
 
     @Test

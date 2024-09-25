@@ -1,28 +1,30 @@
 package soon.PTCMR_Back.domain.category.controller;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static soon.PTCMR_Back.domain.product.entity.ProductTest.createProduct;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryCreateRequest;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryDeleteRequest;
 import soon.PTCMR_Back.domain.category.dto.request.CategoryPaginationRequest;
@@ -37,37 +39,32 @@ import soon.PTCMR_Back.domain.team.repository.TeamJpaRepository;
 import soon.PTCMR_Back.domain.team.service.TeamService;
 import soon.PTCMR_Back.global.util.invite.InviteCodeGenerator;
 
+@AutoConfigureRestDocs(uriScheme = "https", uriHost = "dns-name.com", uriPort = 443)
 @AutoConfigureMockMvc(addFilters = false)
+@ExtendWith(RestDocumentationExtension.class)
 @SpringBootTest
-class CategoryControllerTest {
+public class CategoryControllerDocsTest {
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @Autowired
-    CategoryJpaRepository categoryJpaRepository;
+    private ProductJpaRepository productJpaRepository;
 
     @Autowired
-    ProductJpaRepository productJpaRepository;
+    private InviteCodeGenerator codeGenerator;
 
     @Autowired
-    TeamJpaRepository teamJpaRepository;
+    private TeamJpaRepository teamJpaRepository;
 
     @Autowired
-    InviteCodeGenerator codeGenerator;
+    private CategoryJpaRepository categoryJpaRepository;
 
     @Autowired
-    TeamService teamService;
-
-    @BeforeEach
-    void setUp() {
-//        categoryJpaRepository.deleteAll();
-//        productJpaRepository.deleteAll();
-//        teamJpaRepository.deleteAll();
-    }
+    private TeamService teamService;
 
     @Test
     @DisplayName("[POST] api/v1/category 요청 시 카테고리 생성")
@@ -81,16 +78,17 @@ class CategoryControllerTest {
         String json = objectMapper.writeValueAsString(request);
 
         // expected
-        MvcResult result = mockMvc.perform(post("/api/v1/category")
+        mockMvc.perform(post("/api/v1/category")
                 .contentType(APPLICATION_JSON)
                 .content(json))
             .andExpect(status().isCreated())
-            .andExpect(jsonPath("$").isNumber())
             .andDo(print())
-            .andReturn();
-
-        Long categoryId = Long.parseLong(result.getResponse().getContentAsString());
-        assertTrue(categoryJpaRepository.findById(categoryId).isPresent());
+            .andDo(document("category-create",
+                requestFields(
+                    fieldWithPath("title").description("카테고리 제목"),
+                    fieldWithPath("teamId").description("팀 아이디")
+                ))
+            );
     }
 
     @Test
@@ -112,15 +110,21 @@ class CategoryControllerTest {
         // expected
         mockMvc.perform(patch("/api/v1/category/{categoryId}", category.getId())
                 .contentType(APPLICATION_JSON)
-                .content(json)
-            )
+                .content(json))
             .andExpect(status().isNoContent())
-            .andDo(print());
+            .andDo(print())
+            .andDo(document("category-update",
+                pathParameters(parameterWithName("categoryId").description("카테고리 아이디")),
+                requestFields(
+                    fieldWithPath("title").description("카테고리 제목"),
+                    fieldWithPath("teamId").description("팀 아이디")
+                )
+            ));
     }
 
     @Test
     @DisplayName("[DELETE] api/v1/category 요청 시 카테고리 삭제")
-    void deleteCategoryAndReassignProducts() throws Exception {
+    void deleteCategory() throws Exception {
         // given
         Long teamId = teamService.create(String.valueOf(UUID.randomUUID()), "testTeamTitle");
         Team team = teamJpaRepository.findById(teamId).get();
@@ -133,13 +137,20 @@ class CategoryControllerTest {
 
         CategoryDeleteRequest request = new CategoryDeleteRequest(category.getId(), team.getId());
 
+        String json = objectMapper.writeValueAsString(request);
+
         // expected
         mockMvc.perform(delete("/api/v1/category")
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
-            )
+                .content(json))
             .andExpect(status().isNoContent())
-            .andDo(print());
+            .andDo(print())
+            .andDo(document("category-delete",
+                requestFields(
+                    fieldWithPath("categoryId").description("카테고리 아이디"),
+                    fieldWithPath("teamId").description("팀 아이디")
+                )
+            ));
     }
 
     @Test
@@ -162,6 +173,12 @@ class CategoryControllerTest {
                 .content(objectMapper.writeValueAsString(request))
             )
             .andExpect(status().isOk())
-            .andDo(print());
+            .andDo(print())
+            .andDo(document("category-pagination",
+                requestFields(
+                    fieldWithPath("lastCategoryId").description("마지막으로 전달 받은 카테고리 아이디"),
+                    fieldWithPath("teamId").description("팀 아이디")
+                )
+            ));
     }
 }

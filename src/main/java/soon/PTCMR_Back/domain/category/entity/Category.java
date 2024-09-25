@@ -13,6 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import soon.PTCMR_Back.domain.team.entity.Team;
+import soon.PTCMR_Back.global.exception.CannotModifyDefaultCategoryException;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -31,7 +32,7 @@ public class Category {
     private Team team;
 
     @Builder
-    public Category(String title, Team team) {
+    private Category(String title, Team team) {
         this.title = title;
         this.team = team;
     }
@@ -43,7 +44,14 @@ public class Category {
             .build();
     }
 
-    public void update(String title) {
+    public void update(String title) throws CannotModifyDefaultCategoryException {
+        validateTitleNotDefault();
         this.title = title;
+    }
+
+    private void validateTitleNotDefault() throws CannotModifyDefaultCategoryException {
+        if (this.title.equals("기본")) {
+            throw new CannotModifyDefaultCategoryException();
+        }
     }
 }

@@ -35,7 +35,8 @@ public class ProductService {
     @Transactional
     public Long create(ProductCreateRequest request) {
         Team team = teamRepository.findById(request.teamId());
-        Category category = categoryRepository.findById(request.categoryId());
+        Category category = categoryRepository.findByIdAndTeamId(request.categoryId(),
+            team.getId());
 
         Product product = Product.create()
             .name(request.name())
@@ -98,4 +99,5 @@ public class ProductService {
         }
         return false;
     }
+
 }
