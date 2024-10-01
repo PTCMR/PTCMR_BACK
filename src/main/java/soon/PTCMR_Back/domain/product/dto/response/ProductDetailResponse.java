@@ -24,6 +24,7 @@ public record ProductDetailResponse(
     String category
 ) {
 
+    // TODO: 바꾸기
     public static ProductDetailResponse from(Product product) {
         return new ProductDetailResponse(
             product.getName(),
