@@ -27,7 +27,8 @@ public class ProductPaginationRepository {
     // TODO 연관관계 변경으로 인한 페이징 로직 수정 예정
     public List<ProductPaginationDto> getProductList(Long productId, ProductSortOption option,
         String categoryTitle, Team team) {
-        final BooleanExpression condition = getProductCondition(productId, option);
+        final BooleanExpression productCondition = getProductCondition(productId, option);
+        final BooleanExpression categoryCondition = getCategoryCondition(categoryTitle);
 
         return queryFactory
             .select(Projections.constructor(ProductPaginationDto.class,
@@ -43,12 +44,10 @@ public class ProductPaginationRepository {
                 product.createTime.as("createdDate")
             ))
             .from(product)
-//            .leftJoin(category)
-//            .on(category.product.id.eq(product.id))
             .where(
                 product.team.eq(team),
-//                category.title.eq(categoryTitle),
-                condition
+                productCondition,
+                categoryCondition
             )
             .orderBy(getOrderSpecifier(option))
             .limit(PAGE_SIZE + 1)
@@ -67,9 +66,12 @@ public class ProductPaginationRepository {
         };
     }
 
-    private BooleanExpression getCategoryCondition() {
+    private BooleanExpression getCategoryCondition(String categoryTitle) {
+        if (categoryTitle == null) {
+            return null;
+        }
 
-        return null;
+        return product.category.title.eq(categoryTitle);
     }
 
     private OrderSpecifier<?> getOrderSpecifier(ProductSortOption option) {

@@ -148,7 +148,7 @@ public class ProductServiceTest {
 
         Long lastProductId = null;
         String sortOption = "CREATE_DATE_DESC";
-        String category = "";
+        String category = "test";
 
         ProductPaginationRequest request = new ProductPaginationRequest(lastProductId, sortOption,
             category, team.getId());
